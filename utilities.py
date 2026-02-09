@@ -14,13 +14,17 @@ No global exportable functions are defined.
 Exception(s):
 No exceptions exported.
 """
+from builtins import str
+from builtins import range
+from builtins import object
+
 import argparse
 import re
 import os
 import hashlib
 import requests
 
-class Parser(object):
+class Parser:
     """
     Parser represents an argparse object representing the
     program's input parameters.
@@ -596,7 +600,7 @@ class Parser(object):
         """
         return self.args.useragent
 
-class IPWrapper(object):
+class IPWrapper:
     """
     IPWrapper provides Class Methods to enable checks
     against strings to determine if the string is an IP Address
@@ -631,11 +635,11 @@ class IPWrapper(object):
         #ipRgeFind = re.findall(ipRangePrefix, target)
         #if ipRgeFind is not None or len(ipRgeFind) != 0:
         #    return True
-        ipRangeDash = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
+        ipRangeDash = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
         ipRgeDashFind = re.findall(ipRangeDash,target)
         if ipRgeDashFind is not None or len(ipRgeDashFind) != 0:
             return True
-        ipAddress = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
+        ipAddress = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
         ipFind = re.findall(ipAddress, target)
         if ipFind is not None and len(ipFind) != 0:
             return True
@@ -660,14 +664,14 @@ class IPWrapper(object):
         This Method is tagged as a Class Method
         """
         # IP Address range using prefix syntax
-        ipRangeDash = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
+        ipRangeDash = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
         ipRgeDashFind = re.findall(ipRangeDash, target)
         # IP Address range seperated with a dash
         if ipRgeDashFind is not None and len(ipRgeDashFind) > 0:
             iplist = target[:target.index("-")].split(".")
             iplast = target[target.index("-") + 1:]
             if int(iplist[3]) < int(iplast):
-                for lastoctet in xrange(int(iplist[3]), int(iplast) + 1):
+                for lastoctet in range(int(iplist[3]), int(iplast) + 1):
                     yield target[:target.rindex(".") + 1] + str(lastoctet)
             else:
                 yield target[:target.rindex(".") + 1] + str(iplist[3])
@@ -676,10 +680,10 @@ class IPWrapper(object):
             yield target
 
 
-class VersionChecker(object):
+class VersionChecker:
 
     def __init__(self):
-        super(VersionChecker, self).__init__()
+        super().__init__()
 
     @classmethod
     def getModifiedFileInfo(cls, prefix, gitlocation, filelist):

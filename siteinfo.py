@@ -25,6 +25,10 @@ No global exportable functions are defined.
 Exception(s):
 No exceptions exported.
 """
+from builtins import str
+from builtins import range
+from builtins import object
+
 import requests
 import re
 import time
@@ -41,7 +45,7 @@ requests.packages.urllib3.disable_warnings()
 __TEKDEFENSEXML__ = 'tekdefense.xml'
 __SITESXML__ = 'sites.xml'
 
-class SiteFacade(object):
+class SiteFacade:
     """
     SiteFacade provides a Facade to run the multiple requirements needed
     to automate the site retrieval and storage processes.
@@ -107,10 +111,10 @@ class SiteFacade(object):
         localsitetree = SitesFile.getXMLTree(__SITESXML__, self._verbose)
 
         if not localsitetree and not remotesitetree:
-            print 'Unfortunately there is neither a {tekd} file nor a {sites} file that can be utilized for proper' \
+            print('Unfortunately there is neither a {tekd} file nor a {sites} file that can be utilized for proper' \
                   ' parsing.\nAt least one configuration XML file must be available for Automater to work properly.\n' \
                   'Please see {url} for further instructions.'\
-                .format(tekd=__TEKDEFENSEXML__, sites=__SITESXML__, url=versionlocation)
+                .format(tekd=__TEKDEFENSEXML__, sites=__SITESXML__, url=versionlocation))
         else:
             if localsitetree:
                 for siteelement in localsitetree.iter(tag="site"):
@@ -123,8 +127,8 @@ class SiteFacade(object):
                                     self.buildSiteList(siteelement, webretrievedelay, proxy, targettype, target,
                                                        useragent, botoutputrequested)
                     else:
-                        print 'A problem was found in the {sites} file. There appears to be a site entry with ' \
-                              'unequal numbers of regexs and reporting requirements'.format(sites=__SITESXML__)
+                        print('A problem was found in the {sites} file. There appears to be a site entry with ' \
+                              'unequal numbers of regexs and reporting requirements'.format(sites=__SITESXML__))
             if remotesitetree:
                 for siteelement in remotesitetree.iter(tag="site"):
                     if self.siteEntryIsValid(siteelement):
@@ -136,8 +140,8 @@ class SiteFacade(object):
                                     self.buildSiteList(siteelement, webretrievedelay, proxy, targettype, target,
                                                        useragent, botoutputrequested)
                     else:
-                        print 'A problem was found in the {sites} file. There appears to be a site entry with ' \
-                              'unequal numbers of regexs and reporting requirements'.format(sites=__SITESXML__)
+                        print('A problem was found in the {sites} file. There appears to be a site entry with ' \
+                              'unequal numbers of regexs and reporting requirements'.format(sites=__SITESXML__))
 
     def getSiteInfoIfSiteTypesMatch(self, source, target, siteelement):
         if source == "allsources" or source == siteelement.get("name"):
@@ -163,7 +167,7 @@ class SiteFacade(object):
                                      botoutputrequested, self._verbose)
         if site.Method == "POST":
             self._sites.append(MethodPostSite(site))
-        elif isinstance(site.RegEx, basestring):
+        elif isinstance(site.RegEx, str):
             self._sites.append(SingleResultsSite(site))
         else:
             self._sites.append(MultiResultsSite(site))
@@ -207,7 +211,7 @@ class SiteFacade(object):
         Restriction(s):
         The Method has no restrictions.
         """
-        ipAddress = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
+        ipAddress = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
         ipFind = re.findall(ipAddress, target)
         if ipFind is not None and len(ipFind) > 0:
             return "ip"
@@ -219,7 +223,7 @@ class SiteFacade(object):
 
         return "hostname"
 
-class Site(object):
+class Site:
     """
     Site is the parent object that represents each site used
     for retrieving information. Site stores the results
@@ -1088,7 +1092,7 @@ class Site(object):
         Restriction(s):
         The Method has no restrictions.
         """
-        if isinstance(self._importantProperty, basestring):
+        if isinstance(self._importantProperty, str):
             siteimpprop = getattr(self, "get" + self._importantProperty, Site.getResults)
         else:
             siteimpprop = getattr(self, "get" + self._importantProperty[index], Site.getResults)
@@ -1283,7 +1287,7 @@ class SingleResultsSite(Site):
         Nothing is returned from this Method.
         """
         self._site = site
-        super(SingleResultsSite, self).__init__(self._site.URL, self._site.WebRetrieveDelay, self._site.Proxy,
+        super().__init__(self._site.URL, self._site.WebRetrieveDelay, self._site.Proxy,
                                                 self._site.TargetType, self._site.ReportStringForResult,
                                                 self._site.Target, self._site.UserAgent, self._site.FriendlyName,
                                                 self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested,
@@ -1346,18 +1350,18 @@ class MultiResultsSite(Site):
         Nothing is returned from this Method.
         """
         self._site = site
-        super(MultiResultsSite, self).__init__(self._site.URL, self._site.WebRetrieveDelay,
+        super().__init__(self._site.URL, self._site.WebRetrieveDelay,
                                               self._site.Proxy, self._site.TargetType,
                                               self._site.ReportStringForResult, self._site.Target,
                                               self._site.UserAgent, self._site.FriendlyName,
                                               self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested,
                                               self._site.ImportantPropertyString, self._site.Params,
                                               self._site.Headers, self._site.Method, self._site.PostData, site._verbose)
-        self._results = [[] for x in xrange(len(self._site.RegEx))]
+        self._results = [[] for x in range(len(self._site.RegEx))]
         self.postMessage(self.UserMessage + " " + self.FullURL)
 
         webcontent = self.getWebScrape()
-        for index in xrange(len(self.RegEx)):
+        for index in range(len(self.RegEx)):
             websitecontent = self.getContentList(webcontent, index)
             if websitecontent:
                 self.addMultiResults(websitecontent, index)
@@ -1421,7 +1425,7 @@ class MethodPostSite(Site):
         Nothing is returned from this Method.
         """
         self._site = site
-        super(MethodPostSite, self).__init__(self._site.URL, self._site.WebRetrieveDelay,
+        super().__init__(self._site.URL, self._site.WebRetrieveDelay,
                                              self._site.Proxy, self._site.TargetType,
                                              self._site.ReportStringForResult,
                                              self._site.Target, self._site.UserAgent,
@@ -1438,8 +1442,8 @@ class MethodPostSite(Site):
                                              verbose=site._verbose)
         content = self.submitPost()
         if content:
-            if not isinstance(self.FriendlyName, basestring):  # this is a multi instance
-                self._results = [[] for x in xrange(len(self.RegEx))]
+            if not isinstance(self.FriendlyName, str):  # this is a multi instance
+                self._results = [[] for x in range(len(self.RegEx))]
                 for index in range(len(self.RegEx)):
                     self.addMultiResults(self.getContentList(content, index), index)
             else:  # this is a single instance

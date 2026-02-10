@@ -593,12 +593,15 @@ class IPWrapper:
     Instance variable(s):
     No instance variables.
     """
+    #_ipRangePrefix = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}')
+    _ipRangeDash = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
+    _ipAddress = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
+
 
     @classmethod
     def isIPorIPList(cls, target):
         """
-        Checks if an input string is an IP Address or if it is
-        an IP Address in CIDR or dash notation.
+        Checks if an input string is an IP Address or if it is an IP Address in CIDR or dash notation.
         Returns True if IP Address or CIDR/dash. Returns False if not.
 
         Argument(s):
@@ -610,18 +613,16 @@ class IPWrapper:
         Restriction(s):
         This Method is tagged as a Class Method
         """
-        # IP Address range using prefix syntax
-        #ipRangePrefix = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}')
-        #ipRgeFind = re.findall(ipRangePrefix, target)
-        #if ipRgeFind is not None or len(ipRgeFind) != 0:
+        #ipRgeFind = re.findall(IPWrapper._ipRangePrefix, target)             # IP Address range using prefix syntax
+        #if ipRgeFind is not None and len(ipRgeFind) > 0:
         #    return True
-        ipRangeDash = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
-        ipRgeDashFind = re.findall(ipRangeDash,target)
-        if ipRgeDashFind is not None or len(ipRgeDashFind) != 0:
+
+        ipRgeDashFind = re.findall(IPWrapper._ipRangeDash, target)
+        if ipRgeDashFind is not None and len(ipRgeDashFind) > 0:
             return True
-        ipAddress = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
-        ipFind = re.findall(ipAddress, target)
-        if ipFind is not None and len(ipFind) != 0:
+
+        ipFind = re.findall(IPWrapper._ipAddress, target)
+        if ipFind is not None and len(ipFind) > 0:
             return True
 
         return False
@@ -644,8 +645,7 @@ class IPWrapper:
         This Method is tagged as a Class Method
         """
         # IP Address range using prefix syntax
-        ipRangeDash = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
-        ipRgeDashFind = re.findall(ipRangeDash, target)
+        ipRgeDashFind = re.findall(IPWrapper._ipRangeDash, target)
         # IP Address range seperated with a dash
         if ipRgeDashFind is not None and len(ipRgeDashFind) > 0:
             iplist = target[:target.index("-")].split(".")

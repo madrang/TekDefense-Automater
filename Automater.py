@@ -38,7 +38,6 @@ No exceptions exported.
 Fork of https://github.com/1aN0rmus/TekDefense-Automater
 By ian.ahl@tekdefense.com
 """
-
 import sys
 from siteinfo import SiteFacade, Site
 from utilities import Parser, IPWrapper
@@ -64,11 +63,11 @@ def main():
     """
 
     sites = []
-    parser = Parser('IP, URL, and Hash Passive Analysis tool', __VERSION__)
+    parser = Parser("IP, URL, and Hash Passive Analysis tool", __VERSION__)
 
     # if no target run and print help
     if not parser.hasTarget():
-        print('[!] No argument given.')
+        print("[!] No argument given.")
         parser.print_help()  # need to fix this. Will later
         sys.exit()
 
@@ -77,16 +76,16 @@ def main():
 
     # user may only want to run against one source - allsources
     # is the seed used to check if the user did not enter an s tag
-    sourcelist = ['allsources']
+    sourcelist = ["allsources"]
     if parser.hasSource():
-        sourcelist = parser.Source.split(';')
+        sourcelist = parser.Source.split(";")
 
     # a file input capability provides a possibility of
     # multiple lines of targets
     targetlist = []
     if parser.hasInputFile():
         for tgtstr in TargetFile.TargetList(parser.InputFile, parser.Verbose):
-            tgtstrstripped = tgtstr.replace('[.]', '.').replace('{.}', '.').replace('(.)', '.')
+            tgtstrstripped = tgtstr.replace("[.]", ".").replace("{.}", ".").replace("(.)", ".")
             if IPWrapper.isIPorIPList(tgtstrstripped):
                 for targ in IPWrapper.getTarget(tgtstrstripped):
                     targetlist.append(targ)
@@ -94,7 +93,7 @@ def main():
                 targetlist.append(tgtstrstripped)
     else:  # one target or list of range of targets added on console
         target = parser.Target
-        tgtstrstripped = target.replace('[.]', '.').replace('{.}', '.').replace('(.)', '.')
+        tgtstrstripped = target.replace("[.]", ".").replace("{.}", ".").replace("(.)", ".")
         if IPWrapper.isIPorIPList(tgtstrstripped):
             for targ in IPWrapper.getTarget(tgtstrstripped):
                 targetlist.append(targ)

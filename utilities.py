@@ -14,10 +14,6 @@ No global exportable functions are defined.
 Exception(s):
 No exceptions exported.
 """
-from builtins import str
-from builtins import range
-from builtins import object
-
 import argparse
 import re
 import os
@@ -67,19 +63,19 @@ class Parser:
         """
         # Adding arguments
         self._parser = argparse.ArgumentParser(description=desc)
-        self._parser.add_argument('target', help='List one IP Address (CIDR or dash notation accepted), URL or Hash to query or pass the filename of a file containing IP Address info, URL or Hash to query each separated by a newline.')
-        self._parser.add_argument('-o', '--output', help='This option will output the results to a file.')
-        self._parser.add_argument('-b', '--bot', action="store_true", help='This option will output minimized results for a bot.')
-        self._parser.add_argument('-f', '--cef', help='This option will output the results to a CEF formatted file.')
-        self._parser.add_argument('-w', '--web', help='This option will output the results to an HTML file.')
-        self._parser.add_argument('-c', '--csv', help='This option will output the results to a CSV file.')
-        self._parser.add_argument('-d', '--delay', type=int, default=2, help='This will change the delay to the inputted seconds. Default is 2.')
-        self._parser.add_argument('-s', '--source', help='This option will only run the target against a specific source engine to pull associated domains. Options are defined in the name attribute of the site element in the XML configuration file. This can be a list of names separated by a semicolon.')
-        self._parser.add_argument('--proxy', help='This option will set a proxy to use (eg. proxy.example.com:8080)')
-        self._parser.add_argument('-a', '--useragent', default='Automater/{version}'.format(version=version), help='This option allows the user to set the user-agent seen by web servers being utilized. By default, the user-agent is set to Automater/version')
-        self._parser.add_argument('-V', '--vercheck', action='store_true', help='This option checks and reports versioning for Automater. Checks each python module in the Automater scope. Default, (no -V) is False')
-        self._parser.add_argument('-r', '--refreshxml', action='store_true', help='This option refreshes the tekdefense.xml file from the remote GitHub site. Default (no -r) is False.')
-        self._parser.add_argument('-v', '--verbose', action='store_true', help='This option prints messages to the screen. Default (no -v) is False.')
+        self._parser.add_argument("target", help="List one IP Address (CIDR or dash notation accepted), URL or Hash to query or pass the filename of a file containing IP Address info, URL or Hash to query each separated by a newline.")
+        self._parser.add_argument("-o", "--output", help="This option will output the results to a file.")
+        self._parser.add_argument("-b", "--bot", action="store_true", help="This option will output minimized results for a bot.")
+        self._parser.add_argument("-f", "--cef", help="This option will output the results to a CEF formatted file.")
+        self._parser.add_argument("-w", "--web", help="This option will output the results to an HTML file.")
+        self._parser.add_argument("-c", "--csv", help="This option will output the results to a CSV file.")
+        self._parser.add_argument("-d", "--delay", type=int, default=2, help="This will change the delay to the inputted seconds. Default is 2.")
+        self._parser.add_argument("-s", "--source", help="This option will only run the target against a specific source engine to pull associated domains. Options are defined in the name attribute of the site element in the XML configuration file. This can be a list of names separated by a semicolon.")
+        self._parser.add_argument("--proxy", help="This option will set a proxy to use (eg. proxy.example.com:8080)")
+        self._parser.add_argument("-a", "--useragent", default="Automater/{version}".format(version=version), help="This option allows the user to set the user-agent seen by web servers being utilized. By default, the user-agent is set to Automater/version")
+        self._parser.add_argument("-V", "--vercheck", action="store_true", help="This option checks and reports versioning for Automater. Checks each python module in the Automater scope. Default, (no -V) is False")
+        self._parser.add_argument("-r", "--refreshxml", action="store_true", help="This option refreshes the tekdefense.xml file from the remote GitHub site. Default (no -r) is False.")
+        self._parser.add_argument("-v", "--verbose", action="store_true", help="This option prints messages to the screen. Default (no -v) is False.")
         self.args = self._parser.parse_args()
 
     def hasBotOut(self):
@@ -593,10 +589,9 @@ class IPWrapper:
     Instance variable(s):
     No instance variables.
     """
-    #_ipRangePrefix = re.compile('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}')
-    _ipRangeDash = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}')
-    _ipAddress = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
-
+    #_ipRangePrefix = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}")
+    _ipRangeDash = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}")
+    _ipAddress = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
 
     @classmethod
     def isIPorIPList(cls, target):
@@ -675,18 +670,18 @@ class VersionChecker:
                 if md5local != md5remote:
                     modifiedfiles.append(filename)
             if len(modifiedfiles) == 0:
-                return 'All Automater files are up to date'
+                return "All Automater files are up to date"
             else:
-                return 'The following files require update: {files}.\nSee {gitlocation} to update these files'.\
-                    format(files=', '.join(modifiedfiles), gitlocation=gitlocation)
+                return "The following files require update: {files}.\nSee {gitlocation} to update these files".\
+                    format(files=", ".join(modifiedfiles), gitlocation=gitlocation)
         except:
-            return 'There was an error while checking the version of the Automater files. Please see {gitlocation} ' \
-                   'to determine if there is an issue with your local files'.format(gitlocation=gitlocation)
+            return "There was an error while checking the version of the Automater files. Please see {gitlocation} " \
+                   "to determine if there is an issue with your local files".format(gitlocation=gitlocation)
 
     @classmethod
     def getMD5OfLocalFile(cls, filename):
         md5offile = None
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             md5offile = hashlib.md5(f.read()).hexdigest()
         return md5offile
 

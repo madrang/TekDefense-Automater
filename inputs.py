@@ -10,16 +10,13 @@ TargetFile -- Provides a representation of a file containing target
               strings for Automater to utilize.
 SitesFile -- Provides a representation of the sites.xml
              configuration file.
-              
+
 Function(s):
 No global exportable functions are defined.
 
 Exception(s):
 No exceptions exported.
 """
-from builtins import str
-from builtins import object
-
 import os
 import hashlib
 import requests
@@ -28,8 +25,8 @@ from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
 from xml.etree.ElementTree import ElementTree
 
-__REMOTE_TEKD_XML_LOCATION__ = 'https://raw.githubusercontent.com/1aN0rmus/TekDefense-Automater/master/tekdefense.xml'
-__TEKDEFENSEXML__ = 'tekdefense.xml'
+__REMOTE_TEKD_XML_LOCATION__ = "https://raw.githubusercontent.com/madrang/TekDefense-Automater/master/tekdefense.xml"
+__TEKDEFENSEXML__ = "tekdefense.xml"
 
 class TargetFile(object):
     """
@@ -60,14 +57,14 @@ class TargetFile(object):
         This Method is tagged as a Class Method
         """
         try:
-            target = ''
+            target = ""
             with open(filename) as f:
                 li = f.readlines()
                 for i in li:
                     target = str(i).strip()
                     yield target
         except IOError:
-            SiteDetailOutput.PrintStandardOutput('There was an error reading from the target input file.',
+            SiteDetailOutput.PrintStandardOutput("There was an error reading from the target input file.",
                                                  verbose=verbose)
 
 
@@ -91,7 +88,7 @@ class SitesFile(object):
     @classmethod
     def updateTekDefenseXMLTree(cls, prox, verbose):
         if prox:
-            proxy = {'https': prox, 'http': prox}
+            proxy = {"https": prox, "http": prox}
         else:
             proxy = None
         remotemd5 = None
@@ -101,14 +98,14 @@ class SitesFile(object):
             localmd5 = SitesFile.getMD5OfLocalFile(__TEKDEFENSEXML__)
             localfileexists = True
         except IOError:
-            SiteDetailOutput.PrintStandardOutput('Local file {xmlfile} not located. Attempting download.'.
+            SiteDetailOutput.PrintStandardOutput("Local file {xmlfile} not located. Attempting download.".
                                                  format(xmlfile=__TEKDEFENSEXML__), verbose=verbose)
         try:
             if localfileexists:
                 remotemd5 = SitesFile.getMD5OfRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy=proxy)
                 if remotemd5 and remotemd5 != localmd5:
-                    SiteDetailOutput.PrintStandardOutput('There is an updated remote {xmlfile} file at {url}. '
-                                                         'Attempting download.'.
+                    SiteDetailOutput.PrintStandardOutput("There is an updated remote {xmlfile} file at {url}. "
+                                                         "Attempting download.".
                                                          format(url=__REMOTE_TEKD_XML_LOCATION__,
                                                                 xmlfile=__TEKDEFENSEXML__), verbose=verbose)
                     SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
@@ -116,28 +113,28 @@ class SitesFile(object):
                 SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
         except ConnectionError as ce:
             try:
-                SiteDetailOutput.PrintStandardOutput('Cannot connect to {url}. Server response is {resp} Server error '
-                                                     'code is {code}'.format(url=__REMOTE_TEKD_XML_LOCATION__,
+                SiteDetailOutput.PrintStandardOutput("Cannot connect to {url}. Server response is {resp} Server error "
+                                                     "code is {code}".format(url=__REMOTE_TEKD_XML_LOCATION__,
                                                                              resp=ce.message[0],
                                                                              code=ce.message[1][0]), verbose=verbose)
             except:
-                SiteDetailOutput.PrintStandardOutput('Cannot connect to {url} to retreive the {xmlfile} for use.'.
+                SiteDetailOutput.PrintStandardOutput("Cannot connect to {url} to retreive the {xmlfile} for use.".
                                                      format(url=__REMOTE_TEKD_XML_LOCATION__,
                                                             xmlfile=__TEKDEFENSEXML__), verbose=verbose)
         except HTTPError as he:
             try:
-                SiteDetailOutput.PrintStandardOutput('Cannot connect to {url}. Server response is {resp}.'.
+                SiteDetailOutput.PrintStandardOutput("Cannot connect to {url}. Server response is {resp}.".
                                                      format(url=__REMOTE_TEKD_XML_LOCATION__, resp=he.message),
                                                      verbose=verbose)
             except:
-                SiteDetailOutput.PrintStandardOutput('Cannot connect to {url} to retreive the {xmlfile} for use.'.
+                SiteDetailOutput.PrintStandardOutput("Cannot connect to {url} to retreive the {xmlfile} for use.".
                                                      format(url=__REMOTE_TEKD_XML_LOCATION__,
                                                             xmlfile=__TEKDEFENSEXML__), verbose=verbose)
 
     @classmethod
     def getMD5OfLocalFile(cls, filename):
         md5offile = None
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             md5offile = hashlib.md5(f.read()).hexdigest()
         return md5offile
 
@@ -153,7 +150,7 @@ class SitesFile(object):
         chunk_size = 65535
         resp = requests.get(location, proxies=proxy, verify=False, timeout=5)
         resp.raise_for_status()
-        with open(__TEKDEFENSEXML__, 'wb') as fd:
+        with open(__TEKDEFENSEXML__, "wb") as fd:
             for chunk in resp.iter_content(chunk_size):
                 fd.write(chunk)
 
@@ -180,11 +177,11 @@ class SitesFile(object):
                     sitetree.parse(f)
                     return sitetree
             except:
-                SiteDetailOutput.PrintStandardOutput('There was an error reading from the {xmlfile} input file.\n'
-                                                     'Please check that the {xmlfile} file is present and correctly '
-                                                     'formatted.'.format(xmlfile=filename), verbose=verbose)
+                SiteDetailOutput.PrintStandardOutput("There was an error reading from the {xmlfile} input file.\n"
+                                                     "Please check that the {xmlfile} file is present and correctly "
+                                                     "formatted.".format(xmlfile=filename), verbose=verbose)
         else:
-            SiteDetailOutput.PrintStandardOutput('No local {xmlfile} file present.'.format(xmlfile=filename),
+            SiteDetailOutput.PrintStandardOutput("No local {xmlfile} file present.".format(xmlfile=filename),
                                                  verbose=verbose)
         return None
 

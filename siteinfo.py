@@ -25,10 +25,6 @@ No global exportable functions are defined.
 Exception(s):
 No exceptions exported.
 """
-from builtins import str
-from builtins import range
-from builtins import object
-
 import requests
 import re
 import time
@@ -42,8 +38,8 @@ from utilities import VersionChecker
 
 requests.packages.urllib3.disable_warnings()
 
-__TEKDEFENSEXML__ = 'tekdefense.xml'
-__SITESXML__ = 'sites.xml'
+__TEKDEFENSEXML__ = "tekdefense.xml"
+__SITESXML__ = "sites.xml"
 
 class SiteFacade:
     """
@@ -74,8 +70,22 @@ class SiteFacade:
         self._sites = []
         self._verbose = verbose
 
-    def runSiteAutomation(self, webretrievedelay, proxy, targetlist, sourcelist,
-                          useragent, botoutputrequested, refreshremotexml, versionlocation):
+    def runSiteElement(self, webretrievedelay, proxy, siteelement, targetlist, sourcelist
+                    , useragent, botoutputrequested):
+        if not self.siteEntryIsValid(siteelement):
+            print("A problem was found in the {sites} file. There appears to be a site entry with " \
+                    "unequal numbers of regexs and reporting requirements".format(sites=__SITESXML__))
+            return
+        for targ in targetlist:
+            for source in sourcelist:
+                sitetypematch, targettype, target = self.getSiteInfoIfSiteTypesMatch(source, targ, siteelement)
+                if sitetypematch:
+                    self.buildSiteList(siteelement, webretrievedelay, proxy, targettype, target,
+                                        useragent, botoutputrequested)
+
+
+    def runSiteAutomation(self, webretrievedelay, proxy, targetlist, sourcelist
+                        , useragent, botoutputrequested, refreshremotexml, versionlocation):
         """
         Builds site objects representative of each site listed in the xml
         config file. Appends a Site object or one of it's subordinate objects
@@ -111,37 +121,17 @@ class SiteFacade:
         localsitetree = SitesFile.getXMLTree(__SITESXML__, self._verbose)
 
         if not localsitetree and not remotesitetree:
-            print('Unfortunately there is neither a {tekd} file nor a {sites} file that can be utilized for proper' \
-                  ' parsing.\nAt least one configuration XML file must be available for Automater to work properly.\n' \
-                  'Please see {url} for further instructions.'\
+            print("Unfortunately there is neither a {tekd} file nor a {sites} file that can be utilized for proper" \
+                  " parsing.\nAt least one configuration XML file must be available for Automater to work properly.\n" \
+                  "Please see {url} for further instructions."\
                 .format(tekd=__TEKDEFENSEXML__, sites=__SITESXML__, url=versionlocation))
-        else:
-            if localsitetree:
-                for siteelement in localsitetree.iter(tag="site"):
-                    if self.siteEntryIsValid(siteelement):
-                        for targ in targetlist:
-                            for source in sourcelist:
-                                sitetypematch, targettype, target = self.getSiteInfoIfSiteTypesMatch(source, targ,
-                                                                                                     siteelement)
-                                if sitetypematch:
-                                    self.buildSiteList(siteelement, webretrievedelay, proxy, targettype, target,
-                                                       useragent, botoutputrequested)
-                    else:
-                        print('A problem was found in the {sites} file. There appears to be a site entry with ' \
-                              'unequal numbers of regexs and reporting requirements'.format(sites=__SITESXML__))
-            if remotesitetree:
-                for siteelement in remotesitetree.iter(tag="site"):
-                    if self.siteEntryIsValid(siteelement):
-                        for targ in targetlist:
-                            for source in sourcelist:
-                                sitetypematch, targettype, target = self.getSiteInfoIfSiteTypesMatch(source, targ,
-                                                                                                     siteelement)
-                                if sitetypematch:
-                                    self.buildSiteList(siteelement, webretrievedelay, proxy, targettype, target,
-                                                       useragent, botoutputrequested)
-                    else:
-                        print('A problem was found in the {sites} file. There appears to be a site entry with ' \
-                              'unequal numbers of regexs and reporting requirements'.format(sites=__SITESXML__))
+            return
+        if localsitetree:
+            for siteelement in localsitetree.iter(tag="site"):
+                self.runSiteElement(webretrievedelay, proxy, siteelement, targetlist, sourcelist, useragent, botoutputrequested)
+        if remotesitetree:
+            for siteelement in remotesitetree.iter(tag="site"):
+                self.runSiteElement(webretrievedelay, proxy, siteelement, targetlist, sourcelist, useragent, botoutputrequested)
 
     def getSiteInfoIfSiteTypesMatch(self, source, target, siteelement):
         if source == "allsources" or source == siteelement.get("name"):
@@ -211,12 +201,12 @@ class SiteFacade:
         Restriction(s):
         The Method has no restrictions.
         """
-        ipAddress = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
+        ipAddress = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
         ipFind = re.findall(ipAddress, target)
         if ipFind is not None and len(ipFind) > 0:
             return "ip"
 
-        md5 = re.compile('[a-fA-F0-9]{32}', re.IGNORECASE)
+        md5 = re.compile("[a-fA-F0-9]{32}", re.IGNORECASE)
         md5Find = re.findall(md5,target)
         if md5Find is not None and len(md5Find) > 0:
             return "md5"
@@ -359,9 +349,9 @@ class Site:
     @classmethod
     def checkmoduleversion(self, prefix, gitlocation, proxy, verbose):
         execpath = os.path.dirname(os.path.realpath(__file__))
-        pythonfiles = [f for f in listdir(execpath) if isfile(join(execpath, f)) and f[-3:] == '.py']
+        pythonfiles = [f for f in listdir(execpath) if isfile(join(execpath, f)) and f[-3:] == ".py"]
         if proxy:
-            proxies = {'https': proxy, 'http': proxy}
+            proxies = {"https": proxy, "http": proxy}
         else:
             proxies = None
         SiteDetailOutput.PrintStandardOutput(VersionChecker.getModifiedFileInfo(prefix, gitlocation, pythonfiles),
@@ -1040,6 +1030,28 @@ class Site:
         else:
             self._results = results
 
+    def addMultiResults(self, results, index):
+        """
+        Assigns the argument to the _results instance variable to build
+        the list or results retrieved from the site. Assign None to the
+        _results instance variable if the argument is empty.
+
+        Argument(s):
+        results -- list of results retrieved from the site.
+        index -- integer value representing the index of the result found.
+
+        Return value(s):
+        Nothing is returned from this Method.
+
+        Restriction(s):
+        The Method has no restrictions.
+        """
+        # if no return from site, seed the results with an empty list
+        if results is None or len(results) == 0:
+            self._results[index] = None
+        else:
+            self._results[index] = results
+
     def postMessage(self, message):
         """
         Prints multiple messages to inform the user of progress.
@@ -1161,11 +1173,11 @@ class Site:
     def getHeaderParamProxyInfo(self):
         if self.Headers:
             headers = {x: self.Headers[x] for x in self.Headers}
-            headers['User-agent'] = self.UserAgent
+            headers["User-agent"] = self.UserAgent
         else:
-            headers = {'User-agent': self.UserAgent}
+            headers = {"User-agent": self.UserAgent}
         if self.Proxy:
-            proxy = {'https': self.Proxy, 'http': self.Proxy}
+            proxy = {"https": self.Proxy, "http": self.Proxy}
         else:
             proxy = None
         if self.Params:
@@ -1199,34 +1211,12 @@ class Site:
             return str(resp.content)
         except ConnectionError as ce:
             try:
-                self.postErrorMessage('[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}'.
+                self.postErrorMessage("[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}".
                                       format(url=self.FullURL, resp=ce.message[0], code=ce.message[1][0]))
             except:
-                self.postErrorMessage('[-] Cannot connect to ' + self.FullURL)
+                self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
         except:
-            self.postErrorMessage('[-] Cannot connect to ' + self.FullURL)
-
-    def addMultiResults(self, results, index):
-        """
-        Assigns the argument to the _results instance variable to build
-        the list or results retrieved from the site. Assign None to the
-        _results instance variable if the argument is empty.
-
-        Argument(s):
-        results -- list of results retrieved from the site.
-        index -- integer value representing the index of the result found.
-
-        Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        # if no return from site, seed the results with an empty list
-        if results is None or len(results) == 0:
-            self._results[index] = None
-        else:
-            self._results[index] = results
+            self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
 
     def submitPost(self):
         """
@@ -1255,12 +1245,12 @@ class Site:
             return str(resp.content)
         except ConnectionError as ce:
             try:
-                self.postErrorMessage('[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}'.
+                self.postErrorMessage("[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}".
                                       format(url=self.FullURL, resp=ce.message[0], code=ce.message[1][0]))
             except:
-                self.postErrorMessage('[-] Cannot connect to ' + self.FullURL)
+                self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
         except:
-            self.postErrorMessage('[-] Cannot connect to ' + self.FullURL)
+            self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
 
 
 class SingleResultsSite(Site):
@@ -1298,6 +1288,9 @@ class SingleResultsSite(Site):
         websitecontent = self.getContentList(self.getWebScrape())
         if websitecontent:
             self.addResults(websitecontent)
+        else:
+            self.postErrorMessage("No content found at " + self.FullURL)
+
 
     def getContentList(self, webcontent):
         """
@@ -1361,10 +1354,14 @@ class MultiResultsSite(Site):
         self.postMessage(self.UserMessage + " " + self.FullURL)
 
         webcontent = self.getWebScrape()
+        foundContent = False
         for index in range(len(self.RegEx)):
             websitecontent = self.getContentList(webcontent, index)
             if websitecontent:
                 self.addMultiResults(websitecontent, index)
+                foundContent = True
+        if not foundContent:
+            self.postErrorMessage("No content found at " + self.FullURL)
 
     def getContentList(self, webcontent, index):
         """
@@ -1436,8 +1433,8 @@ class MethodPostSite(Site):
                                              self._site.Params, self._site.Headers,
                                              self._site.Method, self._site.PostData, site._verbose)
         self.postMessage(self.UserMessage + " " + self.FullURL)
-        SiteDetailOutput.PrintStandardOutput('[-] {url} requires a submission for {target}. '
-                                             'Submitting now, this may take a moment.'.
+        SiteDetailOutput.PrintStandardOutput("[-] {url} requires a submission for {target}. "
+                                             "Submitting now, this may take a moment.".
                                              format(url=self._site.URL, target=self._site.Target),
                                              verbose=site._verbose)
         content = self.submitPost()

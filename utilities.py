@@ -42,7 +42,6 @@ class Parser:
     (Property) Proxy
     print_help
     hasTarget
-    hasNoTarget
     (Property) Target
     hasInputFile
     (Property) Source
@@ -459,24 +458,7 @@ class Parser:
         """
         if self.args.target is None:
             return False
-        else:
-            return True
-
-    def hasNoTarget(self):
-        """
-        Checks to determine if a target was provided to the program.
-        Returns False if a target was provided, True if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        return not(self.hasTarget())
+        return True
 
     @property
     def Target(self):
@@ -494,10 +476,9 @@ class Parser:
         Restriction(s):
         This Method is tagged as a Property.
         """
-        if self.hasNoTarget():
+        if not self.hasTarget():
             return None
-        else:
-            return self.args.target
+        return self.args.target
 
     def hasInputFile(self):
         """
@@ -576,12 +557,11 @@ class Parser:
         Restriction(s):
         This Method is tagged as a Property.
         """
-        if self.hasNoTarget():
+        if not self.hasTarget():
             return None
-        elif self.hasInputFile():
-            return self.Target
-        else:
+        if not self.hasInputFile():
             return None
+        return self.Target
 
     @property
     def UserAgent(self):

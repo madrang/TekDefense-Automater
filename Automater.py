@@ -67,7 +67,7 @@ def main():
     parser = Parser('IP, URL, and Hash Passive Analysis tool', __VERSION__)
 
     # if no target run and print help
-    if parser.hasNoTarget():
+    if not parser.hasTarget():
         print('[!] No argument given.')
         parser.print_help()  # need to fix this. Will later
         sys.exit()

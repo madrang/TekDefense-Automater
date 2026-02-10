@@ -1,5 +1,15 @@
-TekDefense-Automater Version: 0.21
+TekDefense-Automater
 ====================
+Fork of https://github.com/1aN0rmus/TekDefense-Automater
+By ian.ahl@tekdefense.com
+
+## Version: 0.1.1
+Updated for python3
+TODO: Detect broken endpoints
+
+Original [README.md](https://github.com/1aN0rmus/TekDefense-Automater)
+====================
+### TekDefense-Automater Version: 0.21
 
 http://www.tekdefense.com/automater/
 http://www.tekdefense.com/news/2013/12/4/finally-the-new-automater-release-is-out.html

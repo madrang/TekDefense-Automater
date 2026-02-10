@@ -1,0 +1,41 @@
+# Byte-code files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# Distribution / packaging
+.Python
+build/
+dist/
+wheels/
+*.egg-info/
+*.egg
+
+# Virtual environment
+venv/
+env/
+/lib/python*/site-packages/
+
+# Editors and IDEs
+.idea/  # JetBrains IDEs (e.g., PyCharm)
+.vscode/ # VS Code
+*.swp
+*.bak
+*.tmp
+
+# Miscellaneous
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+.lint_cache
+pip-log.txt
+pip-delete-this-arg.txt
+.coverage
+.env
+.venv
+
+# OS-specific files
+.DS_Store # macOS
+Thumbs.db # Windows

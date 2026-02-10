@@ -4,7 +4,7 @@ Fork of https://github.com/1aN0rmus/TekDefense-Automater
 By ian.ahl@tekdefense.com
 
 ## Version: 0.1.1
-Updated for python3
+Updated for python3\
 TODO: Detect broken endpoints
 
 Original [README.md](https://github.com/1aN0rmus/TekDefense-Automater)

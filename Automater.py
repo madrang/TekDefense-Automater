@@ -47,7 +47,7 @@ from inputs import TargetFile
 
 __VERSION__ = "0.1.1"
 __GITLOCATION__ = "https://github.com/madrang/TekDefense-Automater"
-__GITFILEPREFIX__ = "https://raw.githubusercontent.com/1aN0rmus/TekDefense-Automater/master/"
+__GITFILEPREFIX__ = "https://raw.githubusercontent.com/madrang/TekDefense-Automater/master/"
 
 def main():
     """

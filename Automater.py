@@ -36,7 +36,7 @@ Exception(s):
 No exceptions exported.
 
 Fork of https://github.com/1aN0rmus/TekDefense-Automater
-By 1aN0rmus@tekdefense.com
+By ian.ahl@tekdefense.com
 """
 
 import sys

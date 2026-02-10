@@ -34,6 +34,9 @@ main -- Provides the instantiation point for Automater.
 
 Exception(s):
 No exceptions exported.
+
+Fork of https://github.com/1aN0rmus/TekDefense-Automater
+By 1aN0rmus@tekdefense.com
 """
 
 import sys
@@ -42,9 +45,9 @@ from utilities import Parser, IPWrapper
 from outputs import SiteDetailOutput
 from inputs import TargetFile
 
-__VERSION__ = '0.21'
-__GITLOCATION__ = 'https://github.com/1aN0rmus/TekDefense-Automater'
-__GITFILEPREFIX__ = 'https://raw.githubusercontent.com/1aN0rmus/TekDefense-Automater/master/'
+__VERSION__ = "0.1.1"
+__GITLOCATION__ = "https://github.com/madrang/TekDefense-Automater"
+__GITFILEPREFIX__ = "https://raw.githubusercontent.com/1aN0rmus/TekDefense-Automater/master/"
 
 def main():
     """

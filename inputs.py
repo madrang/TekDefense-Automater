@@ -20,10 +20,12 @@ No exceptions exported.
 import os
 import hashlib
 import requests
-from outputs import SiteDetailOutput
 from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
 from xml.etree.ElementTree import ElementTree
+
+from outputs import SiteDetailOutput
+from utilities import VersionChecker
 
 __REMOTE_TEKD_XML_LOCATION__ = "https://raw.githubusercontent.com/madrang/TekDefense-Automater/master/tekdefense.xml"
 __TEKDEFENSEXML__ = "tekdefense.xml"
@@ -95,14 +97,14 @@ class SitesFile(object):
         localmd5 = None
         localfileexists = False
         try:
-            localmd5 = SitesFile.getMD5OfLocalFile(__TEKDEFENSEXML__)
+            localmd5 = VersionChecker.getMD5OfLocalFile(__TEKDEFENSEXML__)
             localfileexists = True
         except IOError:
             SiteDetailOutput.PrintStandardOutput("Local file {xmlfile} not located. Attempting download.".
                                                  format(xmlfile=__TEKDEFENSEXML__), verbose=verbose)
         try:
             if localfileexists:
-                remotemd5 = SitesFile.getMD5OfRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy=proxy)
+                remotemd5 = VersionChecker.getMD5OfRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy=proxy)
                 if remotemd5 and remotemd5 != localmd5:
                     SiteDetailOutput.PrintStandardOutput("There is an updated remote {xmlfile} file at {url}. "
                                                          "Attempting download.".
@@ -130,20 +132,6 @@ class SitesFile(object):
                 SiteDetailOutput.PrintStandardOutput("Cannot connect to {url} to retreive the {xmlfile} for use.".
                                                      format(url=__REMOTE_TEKD_XML_LOCATION__,
                                                             xmlfile=__TEKDEFENSEXML__), verbose=verbose)
-
-    @classmethod
-    def getMD5OfLocalFile(cls, filename):
-        md5offile = None
-        with open(filename, "rb") as f:
-            md5offile = hashlib.md5(f.read()).hexdigest()
-        return md5offile
-
-    @classmethod
-    def getMD5OfRemoteFile(cls, location, proxy=None):
-        md5offile = None
-        resp = requests.get(location, proxies=proxy, verify=False, timeout=5)
-        md5offile = hashlib.md5(str(resp.content)).hexdigest()
-        return md5offile
 
     @classmethod
     def getRemoteFile(cls, location, proxy=None):

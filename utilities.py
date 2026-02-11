@@ -650,12 +650,11 @@ class IPWrapper:
                     yield target[:target.rindex(".") + 1] + str(lastoctet)
             else:
                 yield target[:target.rindex(".") + 1] + str(iplist[3])
-        # it's just an IP address at this point
-        else:
+        else: # it's just an IP address at this point
             yield target
 
-
 class VersionChecker:
+    Verbose = True
 
     def __init__(self):
         super().__init__()
@@ -680,14 +679,12 @@ class VersionChecker:
 
     @classmethod
     def getMD5OfLocalFile(cls, filename):
-        md5offile = None
         with open(filename, "rb") as f:
-            md5offile = hashlib.md5(f.read()).hexdigest()
-        return md5offile
+            return hashlib.md5(f.read()).hexdigest()
 
     @classmethod
     def getMD5OfRemoteFile(cls, location, proxy=None):
-        md5offile = None
         resp = requests.get(location, proxies=proxy, verify=False, timeout=5)
-        md5offile = hashlib.md5(str(resp.content)).hexdigest()
-        return md5offile
+        if resp.status_code != requests.codes.ok and VersionChecker.Verbose:
+            print("Unexpected http return code " + resp.status_code + " for file " + location)
+        return hashlib.md5(str(resp.content)).hexdigest()

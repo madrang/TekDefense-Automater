@@ -1085,7 +1085,7 @@ class Site:
         """
         self.postMessage(message)
 
-    def getImportantProperty(self, index):
+    def getImportantProperty(self, index = None):
         """
         Gets the property information from the property value listed in the
         xml file for that specific site in the importantproperty xml tag.
@@ -1107,6 +1107,8 @@ class Site:
         if isinstance(self._importantProperty, str):
             siteimpprop = getattr(self, "get" + self._importantProperty, Site.getResults)
         else:
+            if index is None:
+                index = 0
             siteimpprop = getattr(self, "get" + self._importantProperty[index], Site.getResults)
         return siteimpprop()
 

@@ -153,8 +153,8 @@ class SiteFacade:
         return False
 
     def buildSiteList(self, siteelement, webretrievedelay, proxy, targettype, targ, useragent, botoutputrequested):
-        site = Site.buildSiteFromXML(siteelement, webretrievedelay, proxy, targettype, targ, useragent,
-                                     botoutputrequested, self._verbose)
+        site = Site.buildSiteFromXML(siteelement, webretrievedelay, proxy, targettype, targ, useragent
+                                    , botoutputrequested, self._verbose)
         if site.Method == "POST":
             self._sites.append(MethodPostSite(site))
         elif isinstance(site.RegEx, str):
@@ -1066,9 +1066,8 @@ class Site:
         The Method has no restrictions.
         """
         if self.BotOutputRequested:
-            pass
-        else:
-            SiteDetailOutput.PrintStandardOutput(message, verbose=self._verbose)
+            return
+        SiteDetailOutput.PrintStandardOutput(message, verbose=self._verbose)
 
     def postErrorMessage(self, message):
         """
@@ -1281,20 +1280,19 @@ class SingleResultsSite(Site):
         Nothing is returned from this Method.
         """
         self._site = site
-        super().__init__(self._site.URL, self._site.WebRetrieveDelay, self._site.Proxy,
-                                                self._site.TargetType, self._site.ReportStringForResult,
-                                                self._site.Target, self._site.UserAgent, self._site.FriendlyName,
-                                                self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested,
-                                                self._site.ImportantPropertyString, self._site.Params,
-                                                self._site.Headers, self._site.Method, self._site.PostData,
-                                                site._verbose)
+        super().__init__(self._site.URL, self._site.WebRetrieveDelay, self._site.Proxy
+                        , self._site.TargetType, self._site.ReportStringForResult
+                        , self._site.Target, self._site.UserAgent, self._site.FriendlyName
+                        , self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested
+                        , self._site.ImportantPropertyString, self._site.Params
+                        , self._site.Headers, self._site.Method, self._site.PostData
+                        , site._verbose)
         self.postMessage(self.UserMessage + " " + self.FullURL)
         websitecontent = self.getContentList(self.getWebScrape())
         if websitecontent:
             self.addResults(websitecontent)
         else:
             self.postErrorMessage("No content found at " + self.FullURL)
-
 
     def getContentList(self, webcontent):
         """
@@ -1315,11 +1313,9 @@ class SingleResultsSite(Site):
         """
         try:
             repattern = re.compile(self.RegEx, re.IGNORECASE)
-            foundlist = re.findall(repattern, webcontent)
-            return foundlist
+            return re.findall(repattern, webcontent)
         except:
             self.postErrorMessage(self.ErrorMessage + " " + self.FullURL)
-            return None
 
 class MultiResultsSite(Site):
     """
@@ -1347,13 +1343,13 @@ class MultiResultsSite(Site):
         Nothing is returned from this Method.
         """
         self._site = site
-        super().__init__(self._site.URL, self._site.WebRetrieveDelay,
-                                              self._site.Proxy, self._site.TargetType,
-                                              self._site.ReportStringForResult, self._site.Target,
-                                              self._site.UserAgent, self._site.FriendlyName,
-                                              self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested,
-                                              self._site.ImportantPropertyString, self._site.Params,
-                                              self._site.Headers, self._site.Method, self._site.PostData, site._verbose)
+        super().__init__(self._site.URL, self._site.WebRetrieveDelay
+                        , self._site.Proxy, self._site.TargetType
+                        , self._site.ReportStringForResult, self._site.Target
+                        , self._site.UserAgent, self._site.FriendlyName
+                        , self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested
+                        , self._site.ImportantPropertyString, self._site.Params
+                        , self._site.Headers, self._site.Method, self._site.PostData, site._verbose)
         self._results = [[] for x in range(len(self._site.RegEx))]
         self.postMessage(self.UserMessage + " " + self.FullURL)
 
@@ -1426,16 +1422,16 @@ class MethodPostSite(Site):
         Nothing is returned from this Method.
         """
         self._site = site
-        super().__init__(self._site.URL, self._site.WebRetrieveDelay,
-                                             self._site.Proxy, self._site.TargetType,
-                                             self._site.ReportStringForResult,
-                                             self._site.Target, self._site.UserAgent,
-                                             self._site.FriendlyName,
-                                             self._site.RegEx, self._site.FullURL,
-                                             self._site.BotOutputRequested,
-                                             self._site.ImportantPropertyString,
-                                             self._site.Params, self._site.Headers,
-                                             self._site.Method, self._site.PostData, site._verbose)
+        super().__init__(self._site.URL, self._site.WebRetrieveDelay
+                        , self._site.Proxy, self._site.TargetType
+                        , self._site.ReportStringForResult
+                        , self._site.Target, self._site.UserAgent
+                        , self._site.FriendlyName
+                        , self._site.RegEx, self._site.FullURL
+                        , self._site.BotOutputRequested
+                        , self._site.ImportantPropertyString
+                        , self._site.Params, self._site.Headers
+                        , self._site.Method, self._site.PostData, site._verbose)
         self.postMessage(self.UserMessage + " " + self.FullURL)
         SiteDetailOutput.PrintStandardOutput("[-] {url} requires a submission for {target}. "
                                              "Submitting now, this may take a moment.".
@@ -1471,12 +1467,10 @@ class MethodPostSite(Site):
         try:
             if index == -1: # this is a return for a single instance site
                 repattern = re.compile(self.RegEx, re.IGNORECASE)
-                foundlist = re.findall(repattern, content)
-                return foundlist
+                return re.findall(repattern, content)
             else: # this is the return for a multisite
                 repattern = re.compile(self.RegEx[index], re.IGNORECASE)
-                foundlist = re.findall(repattern, content)
-                return foundlist
+                return re.findall(repattern, content)
         except:
             self.postErrorMessage(self.ErrorMessage + " " + self.FullURL)
             return None

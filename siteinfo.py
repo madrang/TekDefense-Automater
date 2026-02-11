@@ -1210,6 +1210,7 @@ class Site:
         try:
             time.sleep(delay)
             resp = requests.get(self.FullURL, headers=headers, params=params, proxies=proxy, verify=False, timeout=5)
+            resp.raise_for_status()
             return str(resp.content)
         except ConnectionError as ce:
             try:
@@ -1244,6 +1245,7 @@ class Site:
         headers, params, proxy = self.getHeaderParamProxyInfo()
         try:
             resp = requests.post(self.FullURL, data=self.PostData, headers=headers, params=params, proxies=proxy, verify=False)
+            resp.raise_for_status()
             return str(resp.content)
         except ConnectionError as ce:
             try:

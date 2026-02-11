@@ -48,6 +48,80 @@ __VERSION__ = "0.1.1"
 __GITLOCATION__ = "https://github.com/madrang/TekDefense-Automater"
 __GITFILEPREFIX__ = "https://raw.githubusercontent.com/madrang/TekDefense-Automater/master/"
 
+class Automater():
+    def __init__(self, Proxy=None):
+        self.sourcelist = ["allsources"]
+        self.Proxy = Proxy
+        self.Verbose = False
+        self.VersionCheck = False
+        self.UserAgent = "CITDB/1.0"
+        self.hasBotOut = True
+        self.RefreshRemoteXML = False
+        self.Delay = 2                          # Delay used for accessing sites.
+
+    def GetResults(self, targets):
+        targetlist = []
+        for tgt in targets:
+            tgt = tgt.replace("[.]", ".").replace("{.}", ".").replace("(.)", ".")
+            if IPWrapper.isIPorIPList(tgt):
+                for targ in IPWrapper.getTarget(tgt):
+                    targetlist.append(targ)
+            else:
+                targetlist.append(tgt)
+
+        sitefac = SiteFacade(self.Verbose)
+        sitefac.runSiteAutomation(self.Delay, self.Proxy, targetlist, self.sourcelist, self.UserAgent, self.hasBotOut
+                                , self.RefreshRemoteXML, __GITLOCATION__)
+
+        sites = sorted(sitefac.Sites, key=attrgetter("Target"))
+        if sites is None:
+            return []
+
+        resultList = []
+        for site in sites:
+            if not isinstance(site._regex, str): # this is a multisite:
+                for index in range(len(site.RegEx)): # the regexs will ensure we have the exact number of lookups
+                    site_importantProperty = site.getImportantProperty(index)
+                    if site_importantProperty is None or len(site_importantProperty) == 0:
+                        continue
+                    if site_importantProperty[index] is None or len(site_importantProperty[index]) == 0:
+                        continue
+                    # if it's just a string we don't want it to output like a list
+                    if isinstance(site_importantProperty, str):
+                        typ = site.TargetType
+                        source = site.FriendlyName
+                        res = site_importantProperty
+                        resultList.append([ site.Target, typ, site.FriendlyName, res ])
+                    else: # must be a list since it failed the isinstance check on string
+                        laststring = ""
+                        for siteresult in site_importantProperty[index]:
+                            typ = site.TargetType
+                            source = site.FriendlyName[index]
+                            res = siteresult
+                            if "" + site.Target + typ + source + str(res) != laststring:
+                                resultList.append([ site.Target, typ, source, res ])
+                                laststring = "" + site.Target + typ + source + str(res)
+            else: # this is a singlesite
+                site_importantProperty = site.getImportantProperty()
+                if site_importantProperty is None or len(site_importantProperty) == 0:
+                    continue
+                # if it's just a string we don't want it output like a list
+                if isinstance(site_importantProperty, str):
+                    typ = site.TargetType
+                    source = site.FriendlyName
+                    res = site_importantProperty
+                    resultList.append([ site.Target, typ, source, res ])
+                else:
+                    laststring = ""
+                    for siteresult in site_importantProperty:
+                        typ = site.TargetType
+                        source = site.FriendlyName
+                        res = siteresult
+                        if "" + site.Target + typ + source + str(res) != laststring:
+                            resultList.append([ site.Target, typ, source, res ])
+                            laststring = "" + site.Target + typ + source + str(res)
+        return resultList
+
 def main():
     """
     Serves as the instantiation point to start Automater.

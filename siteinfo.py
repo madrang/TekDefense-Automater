@@ -1,23 +1,10 @@
 """
-The siteinfo.py module provides site lookup and result
-storage for those sites based on the xml config
+The siteinfo.py module provides site lookup and result storage for those sites based on the xml config
 file and the arguments sent in to the Automater.
 
 Class(es):
-SiteFacade -- Class used to run the automation necessary to retrieve
-site information and store results.
+SiteFacade -- Class used to run the automation necessary to retrieve site information and store results.
 Site -- Parent Class used to store sites and information retrieved.
-SingleResultsSite -- Class used to store information from a site that
-only has one result requested and discovered.
-MultiResultsSite -- Class used to store information from a site that
-has multiple results requested and discovered.
-PostTransactionPositiveCapableSite -- Class used to store information
-from a site that has single or multiple results requested and discovered.
-This Class is utilized to post information to web sites if a post is
-required and requested via a --p argument utilized when the program is
-called. This Class expects to find the first regular expression listed
-in the xml config file. If that regex is found, it tells the class
-that a post is necessary.
 
 Function(s):
 No global exportable functions are defined.
@@ -155,12 +142,8 @@ class SiteFacade:
     def buildSiteList(self, siteelement, webretrievedelay, proxy, targettype, targ, useragent, botoutputrequested):
         site = Site.buildSiteFromXML(siteelement, webretrievedelay, proxy, targettype, targ, useragent
                                     , botoutputrequested, self._verbose)
-        if site.Method == "POST":
-            self._sites.append(MethodPostSite(site))
-        elif isinstance(site.RegEx, str):
-            self._sites.append(SingleResultsSite(site))
-        else:
-            self._sites.append(MultiResultsSite(site))
+        site.fetchResults()
+        self._sites.append(site)
 
     @property
     def Sites(self):
@@ -218,8 +201,6 @@ class Site:
     Site is the parent object that represents each site used
     for retrieving information. Site stores the results
     discovered from each web site discovered when running Automater.
-    Site is the parent object to SingleResultsSite, MultiResultsSite,
-    PostTransactionPositiveCapableSite and MethodPostSite.
 
     Public Method(s):
     (Class Method) buildSiteFromXML
@@ -1010,27 +991,7 @@ class Site:
             return None
         return self._results
 
-    def addResults(self, results):
-        """
-        Assigns the argument to the _results instance variable to build
-        the list or results retrieved from the site. Assign None to the
-        _results instance variable if the argument is empty.
-
-        Argument(s):
-        results -- list of results retrieved from the site.
-
-        Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if results is None or len(results) == 0:
-            self._results = None
-        else:
-            self._results = results
-
-    def addMultiResults(self, results, index):
+    def addResults(self, results, index = None):
         """
         Assigns the argument to the _results instance variable to build
         the list or results retrieved from the site. Assign None to the
@@ -1046,8 +1007,12 @@ class Site:
         Restriction(s):
         The Method has no restrictions.
         """
-        # if no return from site, seed the results with an empty list
-        if results is None or len(results) == 0:
+        if index is None:
+            if results is None or len(results) == 0:
+                self._results = None
+            else:
+                self._results = results
+        elif results is None or len(results) == 0:
             self._results[index] = None
         else:
             self._results[index] = results
@@ -1277,70 +1242,37 @@ class Site:
         except:
             self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
 
-
-class SingleResultsSite(Site):
-    def __init__(self, site):
-        self._site = site
-        super().__init__(self._site.URL, self._site.WebRetrieveDelay, self._site.Proxy
-                        , self._site.TargetType, self._site.ReportStringForResult
-                        , self._site.Target, self._site.UserAgent, self._site.FriendlyName
-                        , self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested
-                        , self._site.ImportantPropertyString, self._site.Params
-                        , self._site.Headers, self._site.Method, self._site.PostData
-                        , site._verbose)
+    def fetchResults(self):
         self.postMessage(self.UserMessage + " " + self.FullURL)
-        websitecontent = self.getContentList(self.getWebScrape())
-        if websitecontent:
-            self.addResults(websitecontent)
+
+        if self.Method == "POST":
+            SiteDetailOutput.PrintStandardOutput("[-] {url} requires a submission for {target}. "
+                                                "Submitting now, this may take a moment."
+                                                .format(url=self.URL, target=self.Target)
+                                                , verbose=self._verbose)
+            respContent = self.submitPost()
         else:
-            self.postErrorMessage("No content found at " + self.FullURL)
+            respContent = self.getWebScrape()
 
-class MultiResultsSite(Site):
-    def __init__(self, site):
-        self._site = site
-        super().__init__(self._site.URL, self._site.WebRetrieveDelay
-                        , self._site.Proxy, self._site.TargetType
-                        , self._site.ReportStringForResult, self._site.Target
-                        , self._site.UserAgent, self._site.FriendlyName
-                        , self._site.RegEx, self._site.FullURL, self._site.BotOutputRequested
-                        , self._site.ImportantPropertyString, self._site.Params
-                        , self._site.Headers, self._site.Method, self._site.PostData, site._verbose)
-        self._results = [[] for x in range(len(self._site.RegEx))]
-        self.postMessage(self.UserMessage + " " + self.FullURL)
+        if not respContent:
+            self.postErrorMessage("No content returned by " + self.FullURL)
+            return
 
-        webcontent = self.getWebScrape()
+        if isinstance(self.RegEx, str): # this is a single instance
+            content = self.getContentList(respContent)
+            if content:
+                self.addResults(content)
+            else:
+                self.postErrorMessage("No content found at " + self.FullURL)
+            return
+
+        # this is a multi instance
+        self._results = [[] for x in range(len(self.RegEx))]
         foundContent = False
         for index in range(len(self.RegEx)):
-            websitecontent = self.getContentList(webcontent, index)
-            if websitecontent:
-                self.addMultiResults(websitecontent, index)
+            content = self.getContentList(respContent, index)
+            if content:
+                self.addResults(content, index)
                 foundContent = True
         if not foundContent:
             self.postErrorMessage("No content found at " + self.FullURL)
-
-class MethodPostSite(Site):
-    def __init__(self, site):
-        self._site = site
-        super().__init__(self._site.URL, self._site.WebRetrieveDelay
-                        , self._site.Proxy, self._site.TargetType
-                        , self._site.ReportStringForResult
-                        , self._site.Target, self._site.UserAgent
-                        , self._site.FriendlyName
-                        , self._site.RegEx, self._site.FullURL
-                        , self._site.BotOutputRequested
-                        , self._site.ImportantPropertyString
-                        , self._site.Params, self._site.Headers
-                        , self._site.Method, self._site.PostData, site._verbose)
-        self.postMessage(self.UserMessage + " " + self.FullURL)
-        SiteDetailOutput.PrintStandardOutput("[-] {url} requires a submission for {target}. "
-                                             "Submitting now, this may take a moment."
-                                              .format(url=self._site.URL, target=self._site.Target)
-                                             , verbose=site._verbose)
-        content = self.submitPost()
-        if content:
-            if not isinstance(self.FriendlyName, str):  # this is a multi instance
-                self._results = [[] for x in range(len(self.RegEx))]
-                for index in range(len(self.RegEx)):
-                    self.addMultiResults(self.getContentList(content, index), index)
-            else:  # this is a single instance
-                self.addResults(self.getContentList(content))

@@ -123,8 +123,8 @@ class SiteFacade:
         if not localsitetree and not remotesitetree:
             print("Unfortunately there is neither a {tekd} file nor a {sites} file that can be utilized for proper" \
                   " parsing.\nAt least one configuration XML file must be available for Automater to work properly.\n" \
-                  "Please see {url} for further instructions."\
-                .format(tekd=__TEKDEFENSEXML__, sites=__SITESXML__, url=versionlocation))
+                  "Please see {url} for further instructions."
+                .format(tekd = __TEKDEFENSEXML__, sites = __SITESXML__, url = versionlocation))
             return
         if localsitetree:
             for siteelement in localsitetree.iter(tag="site"):
@@ -1220,6 +1220,28 @@ class Site:
         except:
             self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
 
+    def getContentList(self, content, index=None):
+        """
+        Retrieves a list of information retrieved from the sites defined in the xml configuration file.
+        Returns the list of found information from the sites being used as resources or returns None if the site cannot be discovered.
+
+        Argument(s):
+        content -- string representation of the web site being used as a resource.
+        index -- the integer representing the index of the regex list.
+
+        Return value(s):
+        list -- information found from a web site being used as a resource.
+
+        Restriction(s):
+        The Method has no restrictions.
+        """
+        try:
+            repattern = re.compile(self.RegEx if index is None else self.RegEx[index], re.IGNORECASE)
+            return re.findall(repattern, content)
+        except:
+            self.postErrorMessage(self.ErrorMessage + " " + self.FullURL)
+            return None
+
     def submitPost(self):
         """
         Submits information to a web site being used as a resource that
@@ -1248,8 +1270,8 @@ class Site:
             return str(resp.content)
         except ConnectionError as ce:
             try:
-                self.postErrorMessage("[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}".
-                                      format(url=self.FullURL, resp=ce.message[0], code=ce.message[1][0]))
+                self.postErrorMessage("[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}"
+                                    .format(url=self.FullURL, resp=ce.message[0], code=ce.message[1][0]))
             except:
                 self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
         except:
@@ -1257,28 +1279,7 @@ class Site:
 
 
 class SingleResultsSite(Site):
-    """
-    SingleResultsSite inherits from the Site object and represents
-    a site that is being used that has a single result returned.
-
-    Public Method(s):
-    getContentList
-
-    Instance variable(s):
-    _site
-    """
-
     def __init__(self, site):
-        """
-        Class constructor. Assigns a site from the parameter into the _site
-        instance variable. This is a play on the decorator pattern.
-
-        Argument(s):
-        site -- the site that we will decorate.
-
-        Return value(s):
-        Nothing is returned from this Method.
-        """
         self._site = site
         super().__init__(self._site.URL, self._site.WebRetrieveDelay, self._site.Proxy
                         , self._site.TargetType, self._site.ReportStringForResult
@@ -1294,54 +1295,8 @@ class SingleResultsSite(Site):
         else:
             self.postErrorMessage("No content found at " + self.FullURL)
 
-    def getContentList(self, webcontent):
-        """
-        Retrieves a list of information retrieved from the sites defined
-        in the xml configuration file.
-        Returns the list of found information from the sites being used
-        as resources or returns None if the site cannot be discovered.
-
-        Argument(s):
-        webcontent -- actual content of the web page that's been returned
-        from a request.
-
-        Return value(s):
-        list -- information found from a web site being used as a resource.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        try:
-            repattern = re.compile(self.RegEx, re.IGNORECASE)
-            return re.findall(repattern, webcontent)
-        except:
-            self.postErrorMessage(self.ErrorMessage + " " + self.FullURL)
-
 class MultiResultsSite(Site):
-    """
-    MultiResultsSite inherits from the Site object and represents
-    a site that is being used that has multiple results returned.
-
-    Public Method(s):
-    addResults
-    getContentList
-
-    Instance variable(s):
-    _site
-    _results
-    """
-
     def __init__(self, site):
-        """
-        Class constructor. Assigns a site from the parameter into the _site
-        instance variable. This is a play on the decorator pattern.
-
-        Argument(s):
-        site -- the site that we will decorate.
-
-        Return value(s):
-        Nothing is returned from this Method.
-        """
         self._site = site
         super().__init__(self._site.URL, self._site.WebRetrieveDelay
                         , self._site.Proxy, self._site.TargetType
@@ -1363,64 +1318,8 @@ class MultiResultsSite(Site):
         if not foundContent:
             self.postErrorMessage("No content found at " + self.FullURL)
 
-    def getContentList(self, webcontent, index):
-        """
-        Retrieves a list of information retrieved from the sites defined
-        in the xml configuration file.
-        Returns the list of found information from the sites being used
-        as resources or returns None if the site cannot be discovered.
-
-        Argument(s):
-        webcontent -- actual content of the web page that's been returned
-        from a request.
-        index -- the integer representing the index of the regex list.
-
-        Return value(s):
-        list -- information found from a web site being used as a resource.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        try:
-            repattern = re.compile(self.RegEx[index], re.IGNORECASE)
-            foundlist = re.findall(repattern, webcontent)
-            return foundlist
-        except:
-            self.postErrorMessage(self.ErrorMessage + " " + self.FullURL)
-            return None
-
 class MethodPostSite(Site):
-    """
-    MethodPostSite inherits from the Site object
-    and represents a site that may posts information instead of running a GET initially.
-
-    Public Method(s):
-    addMultiResults
-    getContentList
-    getContent
-    postIsNecessary
-    submitPost
-
-    Instance variable(s):
-    _site
-    _postByDefault
-    """
-
     def __init__(self, site):
-        """
-        Class constructor. Assigns a site from the parameter into the _site
-        instance variable. This is a play on the decorator pattern. Also
-        assigns the postbydefault parameter to the _postByDefault instance
-        variable to determine if the Automater should post information
-        to a site. By default Automater will NOT post information.
-
-        Argument(s):
-        site -- the site that we will decorate.
-        postbydefault -- a Boolean representing whether a post will occur.
-
-        Return value(s):
-        Nothing is returned from this Method.
-        """
         self._site = site
         super().__init__(self._site.URL, self._site.WebRetrieveDelay
                         , self._site.Proxy, self._site.TargetType
@@ -1434,9 +1333,9 @@ class MethodPostSite(Site):
                         , self._site.Method, self._site.PostData, site._verbose)
         self.postMessage(self.UserMessage + " " + self.FullURL)
         SiteDetailOutput.PrintStandardOutput("[-] {url} requires a submission for {target}. "
-                                             "Submitting now, this may take a moment.".
-                                             format(url=self._site.URL, target=self._site.Target),
-                                             verbose=site._verbose)
+                                             "Submitting now, this may take a moment."
+                                              .format(url=self._site.URL, target=self._site.Target)
+                                             , verbose=site._verbose)
         content = self.submitPost()
         if content:
             if not isinstance(self.FriendlyName, str):  # this is a multi instance
@@ -1445,32 +1344,3 @@ class MethodPostSite(Site):
                     self.addMultiResults(self.getContentList(content, index), index)
             else:  # this is a single instance
                 self.addResults(self.getContentList(content))
-
-    def getContentList(self, content, index=-1):
-        """
-        Retrieves a list of information retrieved from the sites defined
-        in the xml configuration file.
-        Returns the list of found information from the sites being used
-        as resources or returns None if the site cannot be discovered.
-
-        Argument(s):
-        content -- string representation of the web site being used
-        as a resource.
-        index -- the integer representing the index of the regex list.
-
-        Return value(s):
-        list -- information found from a web site being used as a resource.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        try:
-            if index == -1: # this is a return for a single instance site
-                repattern = re.compile(self.RegEx, re.IGNORECASE)
-                return re.findall(repattern, content)
-            else: # this is the return for a multisite
-                repattern = re.compile(self.RegEx[index], re.IGNORECASE)
-                return re.findall(repattern, content)
-        except:
-            self.postErrorMessage(self.ErrorMessage + " " + self.FullURL)
-            return None

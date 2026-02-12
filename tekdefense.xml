@@ -657,7 +657,7 @@
             <entry>md5</entry>
         </sitetype>
         <!--supports TLS but uses an invalid cert-->
-        <domainurl>http://vxvault.siri-urz.net/</domainurl>
+        <domainurl>http://vxvault.net/</domainurl>
         <reportstringforresult>
             <entry>[+] Date found at VXVault:</entry>
             <entry>[+] URL found at VXVault:</entry>
@@ -670,7 +670,7 @@
             <entry>\&gt;(\d{2}\-\d{2})\&lt;</entry>
             <entry>\[D\].{2,40}\Wphp\?id.{2,10}\&gt;(.{5,100})&lt;\/a</entry>
         </regex>
-        <fullurl>http://vxvault.siri-urz.net/ViriList.php?MD5=%TARGET%</fullurl>
+        <fullurl>http://vxvault.net/ViriList.php?MD5=%TARGET%</fullurl>
         <importantproperty>
             <entry>Results</entry>
             <entry>Results</entry>

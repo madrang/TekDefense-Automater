@@ -72,7 +72,7 @@ class Parser:
         self._parser.add_argument("-d", "--delay", type=int, default=2, help="This will change the delay to the inputted seconds. Default is 2.")
         self._parser.add_argument("-s", "--source", help="This option will only run the target against a specific source engine to pull associated domains. Options are defined in the name attribute of the site element in the XML configuration file. This can be a list of names separated by a semicolon.")
         self._parser.add_argument("--proxy", help="This option will set a proxy to use (eg. proxy.example.com:8080)")
-        self._parser.add_argument("-a", "--useragent", default="Automater/{version}".format(version=version), help="This option allows the user to set the user-agent seen by web servers being utilized. By default, the user-agent is set to Automater/version")
+        self._parser.add_argument("-a", "--useragent", default=f"Automater/{version}", help="This option allows the user to set the user-agent seen by web servers being utilized. By default, the user-agent is set to Automater/version")
         self._parser.add_argument("-V", "--vercheck", action="store_true", help="This option checks and reports versioning for Automater. Checks each python module in the Automater scope. Default, (no -V) is False")
         self._parser.add_argument("-r", "--refreshxml", action="store_true", help="This option refreshes the tekdefense.xml file from the remote GitHub site. Default (no -r) is False.")
         self._parser.add_argument("-v", "--verbose", action="store_true", help="This option prints messages to the screen. Default (no -v) is False.")
@@ -671,11 +671,10 @@ class VersionChecker:
             if len(modifiedfiles) == 0:
                 return "All Automater files are up to date"
             else:
-                return "The following files require update: {files}.\nSee {gitlocation} to update these files".\
-                    format(files=", ".join(modifiedfiles), gitlocation=gitlocation)
+                return f"The following files require update: {", ".join(modifiedfiles)}.\nSee {gitlocation} to update these files"
         except:
-            return "There was an error while checking the version of the Automater files. Please see {gitlocation} " \
-                   "to determine if there is an issue with your local files".format(gitlocation=gitlocation)
+            return f"There was an error while checking the version of the Automater files. Please see {gitlocation} " \
+                   "to determine if there is an issue with your local files"
 
     @classmethod
     def getMD5OfLocalFile(cls, filename):
@@ -686,5 +685,5 @@ class VersionChecker:
     def getMD5OfRemoteFile(cls, location, proxy=None):
         resp = requests.get(location, proxies=proxy, verify=False, timeout=5)
         if resp.status_code != requests.codes.ok and VersionChecker.Verbose:
-            print("Unexpected http return code " + resp.status_code + " for file " + location)
+            print(f"Unexpected http return code {resp.status_code} for file {location}")
         return hashlib.md5(str(resp.content)).hexdigest()

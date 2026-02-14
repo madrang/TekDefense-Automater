@@ -60,8 +60,8 @@ class SiteFacade:
     def runSiteElement(self, webretrievedelay, proxy, siteelement, targetlist, sourcelist
                     , useragent, botoutputrequested):
         if not self.siteEntryIsValid(siteelement):
-            print("A problem was found in the {sites} file. There appears to be a site entry with " \
-                    "unequal numbers of regexs and reporting requirements".format(sites=__SITESXML__))
+            print(f"A problem was found in the {__SITESXML__} file. There appears to be a site entry with " \
+                    "unequal numbers of regexs and reporting requirements")
             return
         for targ in targetlist:
             for source in sourcelist:
@@ -108,10 +108,9 @@ class SiteFacade:
         localsitetree = SitesFile.getXMLTree(__SITESXML__, self._verbose)
 
         if not localsitetree and not remotesitetree:
-            print("Unfortunately there is neither a {tekd} file nor a {sites} file that can be utilized for proper" \
-                  " parsing.\nAt least one configuration XML file must be available for Automater to work properly.\n" \
-                  "Please see {url} for further instructions."
-                .format(tekd = __TEKDEFENSEXML__, sites = __SITESXML__, url = versionlocation))
+            print(f"Unfortunately there is neither a {__TEKDEFENSEXML__} file nor a {__SITESXML__} file that can be utilized for proper parsing.\n" \
+                  "At least one configuration XML file must be available for Automater to work properly.\n" \
+                  f"Please see {versionlocation} for further instructions.")
             return
         if localsitetree:
             for siteelement in localsitetree.iter(tag="site"):
@@ -1178,12 +1177,12 @@ class Site:
             return str(resp.content)
         except ConnectionError as ce:
             try:
-                self.postErrorMessage("[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}".
-                                      format(url=self.FullURL, resp=ce.message[0], code=ce.message[1][0]))
+                self.postErrorMessage(
+                    f"[-] Cannot connect to {self.FullURL}. Server response is {ce.message[0]} Server error code is {ce.message[1][0]}")
             except:
-                self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
+                self.postErrorMessage(f"[-] Cannot connect to {self.FullURL}")
         except:
-            self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
+            self.postErrorMessage(f"[-] Cannot connect to {self.FullURL}")
 
     def getContentList(self, content, index=None):
         """
@@ -1204,7 +1203,7 @@ class Site:
             repattern = re.compile(self.RegEx if index is None else self.RegEx[index], re.IGNORECASE)
             return re.findall(repattern, content)
         except:
-            self.postErrorMessage(self.ErrorMessage + " " + self.FullURL)
+            self.postErrorMessage(f"{self.ErrorMessage} {self.FullURL}")
             return None
 
     def submitPost(self):
@@ -1235,27 +1234,28 @@ class Site:
             return str(resp.content)
         except ConnectionError as ce:
             try:
-                self.postErrorMessage("[-] Cannot connect to {url}. Server response is {resp} Server error code is {code}"
-                                    .format(url=self.FullURL, resp=ce.message[0], code=ce.message[1][0]))
+                self.postErrorMessage(
+                    f"[-] Cannot connect to {self.FullURL}. Server response is {ce.message[0]
+                            } Server error code is {ce.message[1][0]}")
             except:
-                self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
+                self.postErrorMessage(f"[-] Cannot connect to {self.FullURL}")
         except:
-            self.postErrorMessage("[-] Cannot connect to " + self.FullURL)
+            self.postErrorMessage(f"[-] Cannot connect to {self.FullURL}")
 
     def fetchResults(self):
-        self.postMessage(self.UserMessage + " " + self.FullURL)
+        self.postMessage(f"{self.UserMessage} {self.FullURL}")
 
         if self.Method == "POST":
-            SiteDetailOutput.PrintStandardOutput("[-] {url} requires a submission for {target}. "
-                                                "Submitting now, this may take a moment."
-                                                .format(url=self.URL, target=self.Target)
-                                                , verbose=self._verbose)
+            SiteDetailOutput.PrintStandardOutput(
+                f"[-] {self.URL} requires a submission for {self.Target}. "
+                    "Submitting now, this may take a moment."
+                            , verbose=self._verbose)
             respContent = self.submitPost()
         else:
             respContent = self.getWebScrape()
 
         if not respContent:
-            self.postErrorMessage("No content returned by " + self.FullURL)
+            self.postErrorMessage(f"No content returned by {self.FullURL}")
             return
 
         if isinstance(self.RegEx, str): # this is a single instance
@@ -1263,7 +1263,7 @@ class Site:
             if content:
                 self.addResults(content)
             else:
-                self.postErrorMessage("No content found at " + self.FullURL)
+                self.postErrorMessage(f"No content found at {self.FullURL}")
             return
 
         # this is a multi instance
@@ -1275,4 +1275,4 @@ class Site:
                 self.addResults(content, index)
                 foundContent = True
         if not foundContent:
-            self.postErrorMessage("No content found at " + self.FullURL)
+            self.postErrorMessage(f"No content found at {self.FullURL}")

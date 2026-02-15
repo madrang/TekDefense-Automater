@@ -1,18 +1,15 @@
-"""
-The utilities.py module handles all utility functions that Automater
-requires.
+""" The utilities.py module handles all utility functions that Automater requires.
 
 Class(es):
-Parser -- Class to handle standard argparse functions with
-a class-based structure.
-IPWrapper -- Class to provide IP Address formatting and parsing.
-VersionChecker -- Class to check if modifications to any files are available
+    Parser -- Class to handle standard argparse functions with a class-based structure.
+    IPWrapper -- Class to provide IP Address formatting and parsing.
+    VersionChecker -- Class to check if modifications to any files are available
 
 Function(s):
-No global exportable functions are defined.
+    No global exportable functions are defined.
 
 Exception(s):
-No exceptions exported.
+    No exceptions exported.
 """
 import argparse
 import re
@@ -21,45 +18,40 @@ import hashlib
 import requests
 
 class Parser:
-    """
-    Parser represents an argparse object representing the
-    program's input parameters.
+    """ Parser represents an argparse object representing the program's input parameters.
 
     Public Method(s):
-    hasBotOut
-    hasHTMLOutFile
-    (Property) HTMLOutFile
-    hasTextOutFile
-    (Property) TextOutFile
-    hasCSVOutSet
-    (Property) CSVOutFile
-    (Property) Delay
-    hasProxy
-    (Property) Proxy
-    print_help
-    hasTarget
-    (Property) Target
-    hasInputFile
-    (Property) Source
-    hasSource
-    hasPost
-    (Property) InputFile
-    (Property) UserAgent
+        hasBotOut
+        hasHTMLOutFile
+        (Property) HTMLOutFile
+        hasTextOutFile
+        (Property) TextOutFile
+        hasCSVOutSet
+        (Property) CSVOutFile
+        (Property) Delay
+        hasProxy
+        (Property) Proxy
+        print_help
+        hasTarget
+        (Property) Target
+        hasInputFile
+        (Property) Source
+        hasSource
+        hasPost
+        (Property) InputFile
+        (Property) UserAgent
 
     Instance variable(s):
-    _parser
-    args
+        _parser
+        args
     """
 
     def __init__(self, desc, version):
-        """
-        Class constructor. Adds the argparse info into the instance variables.
+        """ Class constructor.
+            Adds the argparse info into the instance variables.
 
         Argument(s):
-        desc -- ArgumentParser description.
-
-        Return value(s):
-        Nothing is returned from this Method.
+            desc -- ArgumentParser description.
         """
         # Adding arguments
         self._parser = argparse.ArgumentParser(description=desc)
@@ -78,516 +70,197 @@ class Parser:
         self._parser.add_argument("-v", "--verbose", action="store_true", help="This option prints messages to the screen. Default (no -v) is False.")
         self.args = self._parser.parse_args()
 
-    def hasBotOut(self):
-        """
-        Checks to determine if user requested an output file minimized for use with a Bot.
-        Returns True if user requested minimized Bot output, False if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.bot:
-            return True
-        else:
-            return False
-
-    def hasCEFOutFile(self):
-        """
-        Checks to determine if user requested an output file formatted in CEF.
-        Returns True if user requested CEF output, False if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.cef:
-            return True
-        else:
-            return False
-
-    @property
-    def CEFOutFile(self):
-        """
-        Checks if there is an CEF output requested.
-        Returns string name of CEF output file if requested
-        or None if not requested.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        string -- Name of an output file to write to system.
-        None -- if CEF output was not requested.
-
-        Restriction(s):
-        This Method is tagged as a Property.
-        """
-        if self.hasCEFOutFile():
-            return self.args.cef
-        else:
-            return None
-
-    def hasHTMLOutFile(self):
-        """
-        Checks to determine if user requested an output file formatted in HTML.
-        Returns True if user requested HTML output, False if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.web:
-            return True
-        else:
-            return False
-
-    @property
-    def HTMLOutFile(self):
-        """
-        Checks if there is an HTML output requested.
-        Returns string name of HTML output file if requested
-        or None if not requested.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        string -- Name of an output file to write to system.
-        None -- if web output was not requested.
-
-        Restriction(s):
-        This Method is tagged as a Property.
-        """
-        if self.hasHTMLOutFile():
-            return self.args.web
-        else:
-            return None
-
-    def hasTextOutFile(self):
-        """
-        Checks to determine if user requested an output text file.
-        Returns True if user requested text file output, False if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.output:
-            return True
-        else:
-            return False
-
-    @property
-    def TextOutFile(self):
-        """
-        Checks if there is a text output requested.
-        Returns string name of text output file if requested
-        or None if not requested.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        string -- Name of an output file to write to system.
-        None -- if output file was not requested.
-
-        Restriction(s):
-        This Method is tagged as a Property.
-        """
-        if self.hasTextOutFile():
-            return self.args.output
-        else:
-            return None
-
-    def versionCheck(self):
-        """
-        Checks to determine if the user wants the program to check for versioning. By default this is True which means
-        the user wants to check for versions.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.vercheck:
-            return True
-        else:
-            return False
-
-    @property
-    def VersionCheck(self):
-        """
-        Checks to determine if the user wants the program to check for versioning. By default this is True which means
-        the user wants to check for versions.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        return self.versionCheck()
-
-    def verbose(self):
-        """
-        Checks to determine if the user wants the program to send standard output to the screen.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.verbose:
-            return True
-        else:
-            return False
-
-    @property
-    def Verbose(self):
-        """
-        Checks to determine if the user wants the program to send standard output to the screen.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        return self.verbose()
-
-    def refreshRemoteXML(self):
-        """
-        Checks to determine if the user wants the program to grab the tekdefense.xml information each run.
-        By default this is True.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.refreshxml:
-            return True
-        else:
-            return False
-
-    @property
-    def RefreshRemoteXML(self):
-        """
-        Checks to determine if the user wants the program to grab the tekdefense.xml information each run.
-        By default this is True.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        return self.refreshRemoteXML()
-
-    def hasCSVOutSet(self):
-        """
-        Checks to determine if user requested an output file delimited by commas.
-        Returns True if user requested file output, False if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.csv:
-            return True
-        else:
-            return False
-
-    @property
-    def CSVOutFile(self):
-        """
-        Checks if there is a comma delimited output requested.
-        Returns string name of comma delimited output file if requested
-        or None if not requested.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        string -- Name of an comma delimited file to write to system.
-        None -- if comma delimited output was not requested.
-
-        Restriction(s):
-        This Method is tagged as a Property.
-        """
-        if self.hasCSVOutSet():
-            return self.args.csv
-        else:
-            return None
-
-    @property
-    def Delay(self):
-        """
-        Returns delay set by input parameters to the program.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        string -- String containing integer to tell program how long to delay
-        between each site query. Default delay is 2 seconds.
-
-        Restriction(s):
-        This Method is tagged as a Property.
-        """
-        return self.args.delay
-
-    def hasProxy(self):
-        """
-        Checks to determine if user requested a proxy.
-        Returns True if user requested a proxy, False if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.proxy:
-            return True
-        else:
-            return False
-
-    @property
-    def Proxy(self):
-        """
-        Returns proxy set by input parameters to the program.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        string -- String containing proxy server in format server:port,
-        default is none
-
-        Restriction(s):
-        This Method is tagged as a Property.
-        """
-        if self.hasProxy():
-            return self.args.proxy
-        else:
-            return None
-
     def print_help(self):
-        """
-        Returns standard help information to determine usage for program.
+        """ Returns standard help information to determine usage for program.
 
         Argument(s):
-        No arguments are required.
+            No arguments are required.
 
         Return value(s):
-        string -- Standard argparse help information to show program usage.
-
-        Restriction(s):
-        This Method has no restrictions.
+            string -- Standard argparse help information to show program usage.
         """
         self._parser.print_help()
 
-    def hasTarget(self):
-        """
-        Checks to determine if a target was provided to the program.
-        Returns True if a target was provided, False if not.
-
-        Argument(s):
-        No arguments are required.
+    @property
+    def hasBotOut(self):
+        """ Checks to determine if user requested an output file minimized for use with a Bot.
+            Returns True if user requested minimized Bot output, False if not.
 
         Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Boolean
         """
-        if self.args.target is None:
-            return False
-        return True
+        return True if self.args.bot else False
+
+    @property
+    def CEFOutFile(self):
+        """ Checks if there is an CEF output requested.
+            Returns string name of CEF output file if requested or None if not requested.
+
+        Return value(s):
+            string -- Name of an output file to write to system.
+            None -- if CEF output was not requested.
+        """
+        return self.args.cef if self.args.cef else None
+
+    @property
+    def CSVOutFile(self):
+        """ Checks if there is a comma delimited output requested.
+            Returns string name of comma delimited output file if requested or None if not requested.
+
+        Return value(s):
+            string -- Name of an comma delimited file to write to system.
+            None -- if comma delimited output was not requested.
+        """
+        return self.args.csv if self.args.csv else None
+
+    @property
+    def HTMLOutFile(self):
+        """ Checks if there is an HTML output requested.
+            Returns string name of HTML output file if requested or None if not requested.
+
+        Return value(s):
+            string -- Name of an output file to write to system.
+            None -- if web output was not requested.
+        """
+        return self.args.web if self.args.web else None
+
+    @property
+    def TextOutFile(self):
+        """ Checks if there is a text output requested.
+            Returns string name of text output file if requested or None if not requested.
+
+        Return value(s):
+            string -- Name of an output file to write to system.
+            None -- if output file was not requested.
+        """
+        return self.args.output if self.args.output else None
+
+    @property
+    def VersionCheck(self):
+        """ Checks to determine if the user wants the program to check for versioning.
+            By default this is True which means the user wants to check for versions.
+
+        Return value(s):
+            Boolean
+        """
+        print(f"VersionCheck: {self.args.vercheck}")
+        return True if self.args.vercheck else False
+
+    @property
+    def Verbose(self):
+        """ Checks to determine if the user wants the program to send standard output to the screen.
+
+        Return value(s):
+            Boolean
+        """
+        return True if self.args.verbose else False
+
+    @property
+    def RefreshRemoteXML(self):
+        """ Checks to determine if the user wants the program to grab the tekdefense.xml information each run.
+                By default this is True.
+
+        Return value(s):
+            Boolean
+        """
+        return True if self.args.refreshxml else False
+
+    @property
+    def Delay(self):
+        """ Returns delay set by input parameters to the program.
+
+        Return value(s):
+            string -- String containing integer to tell program how long to delay between each site query.
+                        Default delay is 2 seconds.
+        """
+        return self.args.delay
+
+    @property
+    def Proxy(self):
+        """ Returns proxy set by input parameters to the program.
+
+        Return value(s):
+            string -- String containing proxy server in format server:port, default is none
+        """
+        return self.args.proxy if self.args.proxy else None
 
     @property
     def Target(self):
-        """
-        Checks to determine the target info provided to the program.
-        Returns string name of target or string name of file
-        or None if a target is not provided.
-
-        Argument(s):
-        No arguments are required.
+        """ Checks to determine the target info provided to the program.
+            Returns string name of target or string name of file or None if a target is not provided.
 
         Return value(s):
-        string -- String target info or filename based on target parameter to program.
-
-        Restriction(s):
-        This Method is tagged as a Property.
+            string -- String target info or filename based on target parameter to program.
         """
-        if not self.hasTarget():
-            return None
-        return self.args.target
+        return self.args.target if self.args.target else None
 
+    @property
     def hasInputFile(self):
-        """
-        Checks to determine if input file is the target of the program.
-        Returns True if a target is an input file, False if not.
+        """ Checks to determine if input file is the target of the program.
+            Returns True if a target is an input file, False if not.
 
         Argument(s):
-        No arguments are required.
+            No arguments are required.
 
         Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Boolean
         """
-        if os.path.exists(self.args.target) and os.path.isfile(self.args.target):
-            return True
-        else:
-            return False
+        return True if os.path.exists(self.args.target) and os.path.isfile(self.args.target) else False
+
+    @property
+    def hasSource(self):
+        """ Checks to determine if -s parameter and source name was provided to the program.
+            Returns True if source name was provided, False if not.
+
+        Argument(s):
+            No arguments are required.
+
+        Return value(s):
+            Boolean
+        """
+        return True if self.args.source else False
 
     @property
     def Source(self):
-        """
-        Checks to determine if a source parameter was provided to the program.
-        Returns string name of source or None if a source is not provided
-
-        Argument(s):
-        No arguments are required.
+        """ Checks to determine if a source parameter was provided to the program.
+            Returns string name of source or None if a source is not provided
 
         Return value(s):
-        string -- String source name based on source parameter to program.
-        None -- If the -s parameter is not used.
-
-        Restriction(s):
-        This Method is tagged as a Property.
+            string -- String source name based on source parameter to program.
+            None -- If the -s parameter is not used.
         """
-        if self.hasSource():
-            return self.args.source
-        else:
-            return None
-
-    def hasSource(self):
-        """
-        Checks to determine if -s parameter and source name
-        was provided to the program.
-        Returns True if source name was provided, False if not.
-
-        Argument(s):
-        No arguments are required.
-
-        Return value(s):
-        Boolean.
-
-        Restriction(s):
-        The Method has no restrictions.
-        """
-        if self.args.source:
-            return True
-        else:
-            return False
+        return self.args.source if self.hasSource() else None
 
     @property
     def InputFile(self):
-        """
-        Checks to determine if an input file string representation of
-        a target was provided as a parameter to the program.
-        Returns string name of file or None if file name is not provided
-
-        Argument(s):
-        No arguments are required.
+        """ Checks to determine if an input file string representation of a target was provided as a parameter to the program.
+            Returns string name of file or None if file name is not provided
 
         Return value(s):
-        string -- String file name based on target filename parameter to program.
-        None -- If the target is not a filename.
-
-        Restriction(s):
-        This Method is tagged as a Property.
+            string -- String file name based on target filename parameter to program.
+            None -- If the target is not a filename.
         """
-        if not self.hasTarget():
-            return None
-        if not self.hasInputFile():
-            return None
-        return self.Target
+        return None if not self.hasTarget() or not self.hasInputFile() else self.Target
 
     @property
     def UserAgent(self):
-        """
-        Returns useragent setting invoked by user at command line or the default
-        user agent provided by the program.
-
-        Argument(s):
-        No arguments are required.
+        """ Returns useragent setting invoked by user at command line or the default user agent provided by the program.
 
         Return value(s):
-        string -- Name utilized as the useragent for the program.
-
-        Restriction(s):
-        This Method is tagged as a Property.
+            string -- Name utilized as the useragent for the program.
         """
         return self.args.useragent
 
 class IPWrapper:
-    """
-    IPWrapper provides Class Methods to enable checks
-    against strings to determine if the string is an IP Address
-    or an IP Address in CIDR or dash notation.
+    """ IPWrapper provides Class Methods to enable checks against strings to determine if the string
+            is an IP Address or an IP Address in CIDR or dash notation.
 
     Public Method(s):
-    (Class Method) isIPorIPList
-    (Class Method) getTarget
+        (Class Method) isIPorIPList
+        (Class Method) getTarget
 
     Instance variable(s):
-    No instance variables.
+        No instance variables.
     """
     #_ipRangePrefix = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}")
     _ipRangeDash = re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}-\d{1,3}")
@@ -595,18 +268,14 @@ class IPWrapper:
 
     @classmethod
     def isIPorIPList(cls, target):
-        """
-        Checks if an input string is an IP Address or if it is an IP Address in CIDR or dash notation.
-        Returns True if IP Address or CIDR/dash. Returns False if not.
+        """ Checks if an input string is an IP Address or if it is an IP Address in CIDR or dash notation.
+            Returns True if IP Address or CIDR/dash. Returns False if not.
 
         Argument(s):
-        target -- string target provided as the first argument to the program.
+            target -- string target provided as the first argument to the program.
 
         Return value(s):
-        Boolean.
-
-        Restriction(s):
-        This Method is tagged as a Class Method
+            Boolean
         """
         #ipRgeFind = re.findall(IPWrapper._ipRangePrefix, target)             # IP Address range using prefix syntax
         #if ipRgeFind is not None and len(ipRgeFind) > 0:
@@ -624,20 +293,15 @@ class IPWrapper:
 
     @classmethod
     def getTarget(cls, target):
-        """
-        Determines whether the target provided is an IP Address or
-        an IP Address in dash notation. Then creates a list
-        that can be utilized as targets by the program.
-        Returns a list of string IP Addresses that can be used as targets.
+        """ Determines whether the target provided is an IP Address or an IP Address in dash notation.
+            Then creates a list that can be utilized as targets by the program.
+            Returns a list of string IP Addresses that can be used as targets.
 
         Argument(s):
-        target -- string target provided as the first argument to the program.
+            target -- string target provided as the first argument to the program.
 
         Return value(s):
-        Iterator of string(s) representing IP Addresses.
-
-        Restriction(s):
-        This Method is tagged as a Class Method
+            Iterator of string(s) representing IP Addresses.
         """
         # IP Address range using prefix syntax
         ipRgeDashFind = re.findall(IPWrapper._ipRangeDash, target)
@@ -654,27 +318,16 @@ class IPWrapper:
             yield target
 
 class VersionChecker:
-    Verbose = True
-
-    def __init__(self):
-        super().__init__()
 
     @classmethod
-    def getModifiedFileInfo(cls, prefix, gitlocation, filelist):
+    def getModifiedFileInfo(cls, prefix, gitlocation, filelist, proxy = None):
         modifiedfiles = []
-        try:
-            for filename in filelist:
-                md5local = VersionChecker.getMD5OfLocalFile(filename)
-                md5remote = VersionChecker.getMD5OfRemoteFile(prefix + filename)
-                if md5local != md5remote:
-                    modifiedfiles.append(filename)
-            if len(modifiedfiles) == 0:
-                return "All Automater files are up to date"
-            else:
-                return f"The following files require update: {", ".join(modifiedfiles)}.\nSee {gitlocation} to update these files"
-        except:
-            return f"There was an error while checking the version of the Automater files. Please see {gitlocation} " \
-                   "to determine if there is an issue with your local files"
+        for filename in filelist:
+            md5local = VersionChecker.getMD5OfLocalFile(filename)
+            md5remote = VersionChecker.getMD5OfRemoteFile(prefix + filename, proxy)
+            if md5local != md5remote:
+                modifiedfiles.append(filename)
+        return modifiedfiles if len(modifiedfiles) > 0 else None
 
     @classmethod
     def getMD5OfLocalFile(cls, filename):
@@ -682,8 +335,9 @@ class VersionChecker:
             return hashlib.md5(f.read()).hexdigest()
 
     @classmethod
-    def getMD5OfRemoteFile(cls, location, proxy=None):
-        resp = requests.get(location, proxies=proxy, verify=False, timeout=5)
-        if resp.status_code != requests.codes.ok and VersionChecker.Verbose:
-            print(f"Unexpected http return code {resp.status_code} for file {location}")
+    def getMD5OfRemoteFile(cls, location, proxy = None):
+        if isinstance(proxy, str):
+            proxy = { "https": proxy, "http": proxy }
+        resp = requests.get(location, proxies = proxy, verify = False, timeout = 5)
+        resp.raise_for_status()
         return hashlib.md5(str(resp.content)).hexdigest()

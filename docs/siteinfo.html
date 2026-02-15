@@ -85,7 +85,7 @@ a&nbsp;site&nbsp;that&nbsp;is&nbsp;being&nbsp;used&nbsp;that&nbsp;has&nbsp;multi
 &nbsp;<br>
 Public&nbsp;Method(s):<br>
 addResults<br>
-getContentList<br>
+parseContent<br>
 &nbsp;<br>
 Instance&nbsp;variable(s):<br>
 _site<br>
@@ -121,7 +121,7 @@ Nothing&nbsp;is&nbsp;returned&nbsp;from&nbsp;this&nbsp;Method.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="MultiResultsSite-getContentList"><strong>getContentList</strong></a>(self, webcontent, index)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
+<dl><dt><a name="MultiResultsSite-parseContent"><strong>parseContent</strong></a>(self, webcontent, index)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
 in&nbsp;the&nbsp;sites.xml&nbsp;configuration&nbsp;file.<br>
 Returns&nbsp;the&nbsp;list&nbsp;of&nbsp;found&nbsp;information&nbsp;from&nbsp;the&nbsp;sites&nbsp;being&nbsp;used<br>
 as&nbsp;resources&nbsp;or&nbsp;returns&nbsp;None&nbsp;if&nbsp;the&nbsp;site&nbsp;cannot&nbsp;be&nbsp;discovered.<br>
@@ -189,7 +189,7 @@ string.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="MultiResultsSite-getWebScrape"><strong>getWebScrape</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
+<dl><dt><a name="MultiResultsSite-getContent"><strong>getContent</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
 the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;HTML&nbsp;markup.&nbsp;Requests&nbsp;via&nbsp;proxy&nbsp;if<br>
 --proxy&nbsp;option&nbsp;was&nbsp;chosen&nbsp;during&nbsp;execution&nbsp;of&nbsp;the&nbsp;Automater.<br>
 Returns&nbsp;the&nbsp;string&nbsp;representing&nbsp;the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;the<br>
@@ -559,8 +559,8 @@ information.<br>
 &nbsp;<br>
 Public&nbsp;Method(s):<br>
 addMultiResults<br>
-getContentList<br>
-submitPost<br>
+parseContent<br>
+postContent<br>
 &nbsp;<br>
 Instance&nbsp;variable(s):<br>
 _site<br>&nbsp;</tt></td></tr>
@@ -595,7 +595,7 @@ Nothing&nbsp;is&nbsp;returned&nbsp;from&nbsp;this&nbsp;Method.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="PostTransactionAPIKeySite-getContentList"><strong>getContentList</strong></a>(self, content, index<font color="#909090">=-1</font>)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
+<dl><dt><a name="PostTransactionAPIKeySite-parseContent"><strong>parseContent</strong></a>(self, content, index<font color="#909090">=-1</font>)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
 in&nbsp;the&nbsp;sites.xml&nbsp;configuration&nbsp;file.<br>
 Returns&nbsp;the&nbsp;list&nbsp;of&nbsp;found&nbsp;information&nbsp;from&nbsp;the&nbsp;sites&nbsp;being&nbsp;used<br>
 as&nbsp;resources&nbsp;or&nbsp;returns&nbsp;None&nbsp;if&nbsp;the&nbsp;site&nbsp;cannot&nbsp;be&nbsp;discovered.<br>
@@ -611,7 +611,7 @@ list&nbsp;--&nbsp;information&nbsp;found&nbsp;from&nbsp;a&nbsp;web&nbsp;site&nbs
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="PostTransactionAPIKeySite-submitPost"><strong>submitPost</strong></a>(self, raw_params, headers)</dt><dd><tt>Submits&nbsp;information&nbsp;to&nbsp;a&nbsp;web&nbsp;site&nbsp;being&nbsp;used&nbsp;as&nbsp;a&nbsp;resource&nbsp;that<br>
+<dl><dt><a name="PostTransactionAPIKeySite-postContent"><strong>postContent</strong></a>(self, raw_params, headers)</dt><dd><tt>Submits&nbsp;information&nbsp;to&nbsp;a&nbsp;web&nbsp;site&nbsp;being&nbsp;used&nbsp;as&nbsp;a&nbsp;resource&nbsp;that<br>
 requires&nbsp;a&nbsp;post&nbsp;of&nbsp;information.&nbsp;Submits&nbsp;via&nbsp;proxy&nbsp;if&nbsp;--proxy<br>
 option&nbsp;was&nbsp;chosen&nbsp;during&nbsp;execution&nbsp;of&nbsp;the&nbsp;Automater.<br>
 Returns&nbsp;a&nbsp;string&nbsp;that&nbsp;contains&nbsp;entire&nbsp;web&nbsp;site&nbsp;being&nbsp;used&nbsp;as&nbsp;a<br>
@@ -695,7 +695,7 @@ string.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="PostTransactionAPIKeySite-getWebScrape"><strong>getWebScrape</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
+<dl><dt><a name="PostTransactionAPIKeySite-getContent"><strong>getContent</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
 the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;HTML&nbsp;markup.&nbsp;Requests&nbsp;via&nbsp;proxy&nbsp;if<br>
 --proxy&nbsp;option&nbsp;was&nbsp;chosen&nbsp;during&nbsp;execution&nbsp;of&nbsp;the&nbsp;Automater.<br>
 Returns&nbsp;the&nbsp;string&nbsp;representing&nbsp;the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;the<br>
@@ -1064,10 +1064,10 @@ and&nbsp;represents&nbsp;a&nbsp;site&nbsp;that&nbsp;may&nbsp;need&nbsp;to&nbsp;p
 &nbsp;<br>
 Public&nbsp;Method(s):<br>
 addMultiResults<br>
-getContentList<br>
+parseContent<br>
 getContent<br>
 postIsNecessary<br>
-submitPost<br>
+postContent<br>
 &nbsp;<br>
 Instance&nbsp;variable(s):<br>
 _site<br>
@@ -1121,7 +1121,7 @@ string.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="PostTransactionPositiveCapableSite-getContentList"><strong>getContentList</strong></a>(self, content, index<font color="#909090">=-1</font>)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
+<dl><dt><a name="PostTransactionPositiveCapableSite-parseContent"><strong>parseContent</strong></a>(self, content, index<font color="#909090">=-1</font>)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
 in&nbsp;the&nbsp;sites.xml&nbsp;configuration&nbsp;file.<br>
 Returns&nbsp;the&nbsp;list&nbsp;of&nbsp;found&nbsp;information&nbsp;from&nbsp;the&nbsp;sites&nbsp;being&nbsp;used<br>
 as&nbsp;resources&nbsp;or&nbsp;returns&nbsp;None&nbsp;if&nbsp;the&nbsp;site&nbsp;cannot&nbsp;be&nbsp;discovered.<br>
@@ -1156,7 +1156,7 @@ Boolean.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="PostTransactionPositiveCapableSite-submitPost"><strong>submitPost</strong></a>(self, raw_params, headers)</dt><dd><tt>Submits&nbsp;information&nbsp;to&nbsp;a&nbsp;web&nbsp;site&nbsp;being&nbsp;used&nbsp;as&nbsp;a&nbsp;resource&nbsp;that<br>
+<dl><dt><a name="PostTransactionPositiveCapableSite-postContent"><strong>postContent</strong></a>(self, raw_params, headers)</dt><dd><tt>Submits&nbsp;information&nbsp;to&nbsp;a&nbsp;web&nbsp;site&nbsp;being&nbsp;used&nbsp;as&nbsp;a&nbsp;resource&nbsp;that<br>
 requires&nbsp;a&nbsp;post&nbsp;of&nbsp;information.&nbsp;Submits&nbsp;via&nbsp;proxy&nbsp;if&nbsp;--proxy<br>
 option&nbsp;was&nbsp;chosen&nbsp;during&nbsp;execution&nbsp;of&nbsp;the&nbsp;Automater.<br>
 Returns&nbsp;a&nbsp;string&nbsp;that&nbsp;contains&nbsp;entire&nbsp;web&nbsp;site&nbsp;being&nbsp;used&nbsp;as&nbsp;a<br>
@@ -1240,7 +1240,7 @@ string.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="PostTransactionPositiveCapableSite-getWebScrape"><strong>getWebScrape</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
+<dl><dt><a name="PostTransactionPositiveCapableSite-getContent"><strong>getContent</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
 the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;HTML&nbsp;markup.&nbsp;Requests&nbsp;via&nbsp;proxy&nbsp;if<br>
 --proxy&nbsp;option&nbsp;was&nbsp;chosen&nbsp;during&nbsp;execution&nbsp;of&nbsp;the&nbsp;Automater.<br>
 Returns&nbsp;the&nbsp;string&nbsp;representing&nbsp;the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;the<br>
@@ -1608,7 +1608,7 @@ This&nbsp;Method&nbsp;is&nbsp;tagged&nbsp;as&nbsp;a&nbsp;Property.</tt></dd>
 a&nbsp;site&nbsp;that&nbsp;is&nbsp;being&nbsp;used&nbsp;that&nbsp;has&nbsp;a&nbsp;single&nbsp;result&nbsp;returned.<br>
 &nbsp;<br>
 Public&nbsp;Method(s):<br>
-getContentList<br>
+parseContent<br>
 &nbsp;<br>
 Instance&nbsp;variable(s):<br>
 _site<br>&nbsp;</tt></td></tr>
@@ -1629,7 +1629,7 @@ site&nbsp;--&nbsp;the&nbsp;site&nbsp;that&nbsp;we&nbsp;will&nbsp;decorate.<br>
 Return&nbsp;value(s):<br>
 Nothing&nbsp;is&nbsp;returned&nbsp;from&nbsp;this&nbsp;Method.</tt></dd></dl>
 
-<dl><dt><a name="SingleResultsSite-getContentList"><strong>getContentList</strong></a>(self, webcontent)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
+<dl><dt><a name="SingleResultsSite-parseContent"><strong>parseContent</strong></a>(self, webcontent)</dt><dd><tt>Retrieves&nbsp;a&nbsp;list&nbsp;of&nbsp;information&nbsp;retrieved&nbsp;from&nbsp;the&nbsp;sites&nbsp;defined<br>
 in&nbsp;the&nbsp;sites.xml&nbsp;configuration&nbsp;file.<br>
 Returns&nbsp;the&nbsp;list&nbsp;of&nbsp;found&nbsp;information&nbsp;from&nbsp;the&nbsp;sites&nbsp;being&nbsp;used<br>
 as&nbsp;resources&nbsp;or&nbsp;returns&nbsp;None&nbsp;if&nbsp;the&nbsp;site&nbsp;cannot&nbsp;be&nbsp;discovered.<br>
@@ -1709,7 +1709,7 @@ string.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="SingleResultsSite-getWebScrape"><strong>getWebScrape</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
+<dl><dt><a name="SingleResultsSite-getContent"><strong>getContent</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
 the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;HTML&nbsp;markup.&nbsp;Requests&nbsp;via&nbsp;proxy&nbsp;if<br>
 --proxy&nbsp;option&nbsp;was&nbsp;chosen&nbsp;during&nbsp;execution&nbsp;of&nbsp;the&nbsp;Automater.<br>
 Returns&nbsp;the&nbsp;string&nbsp;representing&nbsp;the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;the<br>
@@ -2108,7 +2108,7 @@ getImportantProperty<br>
 getTarget<br>
 getResults<br>
 getFullURL<br>
-getWebScrape<br>
+getContent<br>
 &nbsp;<br>
 Instance&nbsp;variable(s):<br>
 _sites<br>
@@ -2229,7 +2229,7 @@ string.<br>
 Restriction(s):<br>
 The&nbsp;Method&nbsp;has&nbsp;no&nbsp;restrictions.</tt></dd></dl>
 
-<dl><dt><a name="Site-getWebScrape"><strong>getWebScrape</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
+<dl><dt><a name="Site-getContent"><strong>getContent</strong></a>(self)</dt><dd><tt>Attempts&nbsp;to&nbsp;retrieve&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;web&nbsp;site.&nbsp;String&nbsp;retrieved&nbsp;is<br>
 the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;HTML&nbsp;markup.&nbsp;Requests&nbsp;via&nbsp;proxy&nbsp;if<br>
 --proxy&nbsp;option&nbsp;was&nbsp;chosen&nbsp;during&nbsp;execution&nbsp;of&nbsp;the&nbsp;Automater.<br>
 Returns&nbsp;the&nbsp;string&nbsp;representing&nbsp;the&nbsp;entire&nbsp;web&nbsp;site&nbsp;including&nbsp;the<br>

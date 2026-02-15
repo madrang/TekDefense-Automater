@@ -1,18 +1,16 @@
 """
-The outputs.py module represents some form of all outputs
-from the Automater program to include all variation of
-output files. Any addition to the Automater that brings
-any other output requirement should be programmed in this module.
+The outputs.py module represents some form of all outputs from the Automater program to include all variation of output files.
+Any addition to the Automater that brings any other output requirement should be programmed in this module.
 
 Class(es):
-SiteDetailOutput -- Wrapper class around all functions that print output
-from Automater, to include standard output and file system output.
+    SiteDetailOutput -- Wrapper class around all functions that print output from Automater,
+                        to include standard output and file system output.
 
 Function(s):
-No global exportable functions are defined.
+    No global exportable functions are defined.
 
 Exception(s):
-No exceptions exported.
+    No exceptions exported.
 """
 import csv
 import socket
@@ -21,88 +19,67 @@ from datetime import datetime
 from operator import attrgetter
 
 class SiteDetailOutput:
-    """
-    SiteDetailOutput provides the capability to output information
-    to the screen, a text file, a comma-seperated value file, or
-    a file formatted with html markup (readable by web browsers).
+    """ SiteDetailOutput provides the capability to output information
+            to the screen, a text file, a comma-seperated value file, or an html file.
 
     Public Method(s):
-    createOutputInfo
+        createOutputInfo
 
     Instance variable(s):
-    _listofsites - list storing the list of site results stored.
+        _listofsites - list storing the list of site results stored.
     """
 
     def __init__(self,sitelist):
-        """
-        Class constructor. Stores the incoming list of sites in the _listofsites list.
+        """ Class constructor.
+            Stores the incoming list of sites in the _listofsites list.
 
         Argument(s):
-        sitelist -- list containing site result information to be printed.
-
-        Return value(s):
-        Nothing is returned from this Method.
+            sitelist -- list containing site result information to be printed.
         """
         self._listofsites = []
         self._listofsites = sitelist
 
     @property
     def ListOfSites(self):
-        """
-        Checks instance variable _listofsites for content.
-        Returns _listofsites if it has content or None if it does not.
-
-        Argument(s):
-        No arguments are required.
+        """ Checks instance variable _listofsites for content.
+            Returns _listofsites if it has content or None if it does not.
 
         Return value(s):
-        _listofsites -- list containing list of site results if variable contains data.
-        None -- if _listofsites is empty or not assigned.
-
-        Restriction(s):
-        This Method is tagged as a Property.
+            _listofsites -- list containing list of site results if variable contains data.
+            None -- if _listofsites is empty or not assigned.
         """
         if self._listofsites is None or len(self._listofsites) == 0:
             return None
         return self._listofsites
 
     def createOutputInfo(self,parser):
-        """
-        Checks parser information calls correct print methods based on parser requirements.
-        Returns nothing.
+        """ Checks parser information calls correct print methods based on parser requirements.
 
         Argument(s):
-        parser -- Parser object storing program input parameters used when program was run.
+            parser -- Parser object storing program input parameters used when program was run.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
-        self.PrintToScreen(parser.hasBotOut())
-        if parser.hasCEFOutFile():
+        self.PrintToScreen(parser.hasBotOut)
+        if parser.CEFOutFile:
             self.PrintToCEFFile(parser.CEFOutFile)
-        if parser.hasTextOutFile():
+        if parser.TextOutFile:
             self.PrintToTextFile(parser.TextOutFile)
-        if parser.hasHTMLOutFile():
+        if parser.HTMLOutFile:
             self.PrintToHTMLFile(parser.HTMLOutFile)
-        if parser.hasCSVOutSet():
+        if parser.CSVOutFile:
             self.PrintToCSVFile(parser.CSVOutFile)
 
+
     def PrintToScreen(self, printinbotformat):
-        """
-        Calls correct function to ensure site information is printed to the user's standard output correctly.
-        Returns nothing.
+        """ Calls correct function to ensure site information is printed to the user's standard output correctly.
 
         Argument(s):
-        printinbotformat -- True or False argument representing minimized output. True if minimized requested.
+            printinbotformat -- True or False argument representing minimized output. True if minimized requested.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
         if printinbotformat:
             self.PrintToScreenBot()
@@ -110,18 +87,13 @@ class SiteDetailOutput:
             self.PrintToScreenNormal()
 
     def PrintToScreenBot(self):
-        """
-        Formats site information minimized and prints it to the user's standard output.
-        Returns nothing.
+        """ Formats site information minimized and prints it to the user's standard output.
 
         Argument(s):
-        No arguments are required.
+            No arguments are required.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
         sites = sorted(self.ListOfSites, key=attrgetter("Target"))
         if sites is None:
@@ -197,18 +169,13 @@ class SiteDetailOutput:
                                 laststring = f"{site.ReportStringForResult} {siteresult}"
 
     def PrintToScreenNormal(self):
-        """
-        Formats site information correctly and prints it to the user's standard output.
-        Returns nothing.
+        """ Formats site information correctly and prints it to the user's standard output.
 
         Argument(s):
-        No arguments are required.
+            No arguments are required.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
         sites = sorted(self.ListOfSites, key=attrgetter("Target"))
         target = ""
@@ -271,29 +238,25 @@ class SiteDetailOutput:
                                     laststring = f"{site.ReportStringForResult} {siteresult}"
 
     def PrintToCEFFile(self, cefoutfile):
-        """
-        Formats site information correctly and prints it to an output file in CEF format.
-        CEF format specification from http://mita-tac.wikispaces.com/file/view/CEF+White+Paper+071709.pdf
-        "Jan 18 11:07:53 host message"
+        """ Formats site information correctly and prints it to an output file in CEF format.
+            CEF format specification from http://mita-tac.wikispaces.com/file/view/CEF+White+Paper+071709.pdf
+            "Jan 18 11:07:53 host message"
         where message:
-        "CEF:Version|Device Vendor|Device Product|Device Version|Signature ID|Name|Severity|Extension"
-        Returns nothing.
+            "CEF:Version|Device Vendor|Device Product|Device Version|Signature ID|Name|Severity|Extension"
 
         Argument(s):
-        cefoutfile -- A string representation of a file that will store the output.
+            cefoutfile -- A string representation of a file that will store the output.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
         sites = sorted(self.ListOfSites, key = attrgetter("Target"))
-        curr_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        hostname = socket.gethostname()
         cef_Severity = "2"
         cef_fields = [
-            " ".join([curr_date, hostname])     # Prefix
+            " ".join([
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+              , socket.gethostname()
+               ])                               # Prefix
             , "CEF:Version1.1"                  # CEF Version
             , "TekDefense"                      # Vendor
             , "Automater"                       # Product
@@ -404,20 +367,15 @@ class SiteDetailOutput:
         print(f"{cefoutfile} Generated")
 
     def PrintToTextFile(self,textoutfile):
-        """
-        Formats site information correctly and prints it to an output file in text format.
-        Returns nothing.
+        """ Formats site information correctly and prints it to an output file in text format.
 
         Argument(s):
-        textoutfile -- A string representation of a file that will store the output.
+            textoutfile -- A string representation of a file that will store the output.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
-        sites = sorted(self.ListOfSites, key=attrgetter("Target"))
+        sites = sorted(self.ListOfSites, key = attrgetter("Target"))
         target = ""
         print(f"\n[+] Generating text output: {textoutfile}")
         f = open(textoutfile, "w")
@@ -465,18 +423,13 @@ class SiteDetailOutput:
         print(f"{textoutfile} Generated")
 
     def PrintToCSVFile(self,csvoutfile):
-        """
-        Formats site information correctly and prints it to an output file with comma-seperators.
-        Returns nothing.
+        """ Formats site information correctly and prints it to an output file with comma-seperators.
 
         Argument(s):
-        csvoutfile -- A string representation of a file that will store the output.
+            csvoutfile -- A string representation of a file that will store the output.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
         sites = sorted(self.ListOfSites, key=attrgetter("Target"))
         target = ""
@@ -538,18 +491,13 @@ class SiteDetailOutput:
         print(f"{csvoutfile} Generated")
 
     def PrintToHTMLFile(self, htmloutfile):
-        """
-        Formats site information correctly and prints it to an output file using HTML markup.
-        Returns nothing.
+        """ Formats site information correctly and prints it to an output file using HTML markup.
 
         Argument(s):
-        htmloutfile -- A string representation of a file that will store the output.
+            htmloutfile -- A string representation of a file that will store the output.
 
         Return value(s):
-        Nothing is returned from this Method.
-
-        Restriction(s):
-        The Method has no restrictions.
+            Nothing is returned from this Method.
         """
         sites = sorted(self.ListOfSites, key=attrgetter("Target"))
         target = ""
@@ -600,18 +548,13 @@ class SiteDetailOutput:
             print(strout)
 
     def getHTMLOpening(self):
-        """
-        Creates HTML markup to provide correct formatting for initial HTML file requirements.
-        Returns string that contains opening HTML markup information for HTML output file.
+        """ Creates HTML markup to provide correct formatting for initial HTML file requirements.
 
         Argument(s):
-        No arguments required.
+            No arguments required.
 
         Return value(s):
-        string.
-
-        Restriction(s):
-        The Method has no restrictions.
+            string -- contains opening HTML markup information for HTML output file.
         """
         return """<style type="text/css">
                         #table-3 {
@@ -682,26 +625,20 @@ class SiteDetailOutput:
                         <th>Source</th>
                         <th>Result</th>
                         </tr>
-                        """
+            """
 
     def getHTMLClosing(self):
-        """
-        Creates HTML markup to provide correct formatting for closing HTML file requirements.
-        Returns string that contains closing HTML markup information for HTML output file.
+        """ Creates HTML markup to provide correct formatting for closing HTML file requirements.
 
         Argument(s):
-        No arguments required.
+            No arguments required.
 
         Return value(s):
-        string.
-
-        Restriction(s):
-        The Method has no restrictions.
+            string -- contains closing HTML markup information for HTML output file.
         """
         return """
             </table>
-            <br>
-            <br>
+            <br><br>
             <p>Created using Automater.py by @TekDefense <a href="http://www.tekdefense.com">http://www.tekdefense.com</a>; <a href="https://github.com/madrang/TekDefense">https://github.com/madrang/TekDefense</a></p>
             </body>
             </html>

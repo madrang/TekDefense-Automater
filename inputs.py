@@ -31,32 +31,27 @@ __REMOTE_TEKD_XML_LOCATION__ = "https://raw.githubusercontent.com/madrang/TekDef
 __TEKDEFENSEXML__ = "tekdefense.xml"
 
 class TargetFile(object):
-    """
-    TargetFile provides a Class Method to retrieve information from a file-
-    based target when one is entered as the first parameter to the program.
+    """ TargetFile provides a Class Method to retrieve information from a file-based target when one is entered
+            as the first parameter to the program.
     
     Public Method(s):
-    (Class Method) TargetList
+        (Class Method) TargetList
     
     Instance variable(s):
-    No instance variables.
+        No instance variables.
     """
 
     @classmethod
-    def TargetList(self, filename, verbose):
-        """
-        Opens a file for reading.
-        Returns each string from each line of a single or multi-line file.
-        
+    def TargetList(self, filename, verbose = False):
+        """ Opens a file for reading.
+                Returns each string from each line of a single or multi-line file.
+
         Argument(s):
-        filename -- string based name of the file that will be retrieved and parsed.
-        verbose -- boolean value representing whether output will be printed to stdout
+            filename -- string based name of the file that will be retrieved and parsed.
+            verbose -- boolean value representing whether output will be printed to stdout
 
         Return value(s):
-        Iterator of string(s) found in a single or multi-line file.
-        
-        Restriction(s):
-        This Method is tagged as a Class Method
+            Iterator of string(s) found in a single or multi-line file.
         """
         try:
             target = ""
@@ -66,33 +61,29 @@ class TargetFile(object):
                     target = str(i).strip()
                     yield target
         except IOError:
-            SiteDetailOutput.PrintStandardOutput("There was an error reading from the target input file.",
-                                                 verbose=verbose)
-
+            SiteDetailOutput.PrintStandardOutput("There was an error reading from the target input file."
+                                        , verbose = verbose)
 
 class SitesFile(object):
-    """
-    SitesFile represents an XML Elementree object representing the
-    program's configuration file. Returns XML Elementree object. The tekdefense.xml file is hosted on tekdefense.com's
-    github and unless asked otherwise, will be checked to ensure the versions are correct. If they are not, the new
-    tekdefense.xml will be downloaded and used by default. The local sites.xml is the user's capability to have local
-    decisions made on top of the tekdefense.xml configuration file. Switches will be created to enable and disable
-    these capabilities.
-    
+    """ SitesFile represents an XML Elementree object representing the program's configuration file.
+    The tekdefense.xml file is hosted on tekdefense.com's github and unless asked otherwise,
+            will be checked to ensure the versions are correct.
+    If they are not, the new tekdefense.xml will be downloaded and used by default.
+    The local sites.xml is the user's capability to have local decisions made on top of the tekdefense.xml configuration file.
+    Switches will be created to enable and disable these capabilities.
+
     Method(s):
-    (Class Method) getXMLTree
-    (Class Method) fileExists
-    
+        (Class Method) getXMLTree
+        (Class Method) fileExists
+
     Instance variable(s):
-    No instance variables.
+        No instance variables.
     """
 
     @classmethod
-    def updateTekDefenseXMLTree(cls, prox, verbose):
-        if prox:
-            proxy = {"https": prox, "http": prox}
-        else:
-            proxy = None
+    def updateTekDefenseXMLTree(cls, proxy = None, verbose = False):
+        if isinstance(proxy, str):
+            proxy = {"https": proxy, "http": proxy}
         remotemd5 = None
         localmd5 = None
         localfileexists = False
@@ -101,14 +92,14 @@ class SitesFile(object):
             localfileexists = True
         except IOError:
             SiteDetailOutput.PrintStandardOutput(f"Local file {__TEKDEFENSEXML__} not located. Attempting download."
-                            , verbose=verbose)
+                            , verbose = verbose)
         try:
             if localfileexists:
                 remotemd5 = VersionChecker.getMD5OfRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy=proxy)
                 if remotemd5 and remotemd5 != localmd5:
                     SiteDetailOutput.PrintStandardOutput(f"There is an updated remote {__TEKDEFENSEXML__} file at {__REMOTE_TEKD_XML_LOCATION__}. "
                                                          "Attempting download."
-                                                         , verbose=verbose)
+                                                         , verbose = verbose)
                     SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
             else:
                 SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
@@ -116,45 +107,40 @@ class SitesFile(object):
             try:
                 SiteDetailOutput.PrintStandardOutput(
                     f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. Server response is {ce.message[0]} Server error "
-                        f"code is {ce.message[1][0]}", verbose=verbose)
+                        f"code is {ce.message[1][0]}", verbose = verbose)
             except:
                 SiteDetailOutput.PrintStandardOutput(
                     f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive the {__TEKDEFENSEXML__} for use."
-                                        , verbose=verbose)
+                                        , verbose = verbose)
         except HTTPError as he:
             try:
                 SiteDetailOutput.PrintStandardOutput(
                     f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. Server response is {he.message}."
-                                            , verbose=verbose)
+                                            , verbose = verbose)
             except:
                 SiteDetailOutput.PrintStandardOutput(
                     f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive the {__TEKDEFENSEXML__} for use."
-                                        , verbose=verbose)
+                                        , verbose = verbose)
 
     @classmethod
-    def getRemoteFile(cls, location, proxy=None):
+    def getRemoteFile(cls, location, proxy = None):
         chunk_size = 65535
-        resp = requests.get(location, proxies=proxy, verify=False, timeout=5)
+        resp = requests.get(location, proxies = proxy, verify = False, timeout = 5)
         resp.raise_for_status()
         with open(__TEKDEFENSEXML__, "wb") as fd:
             for chunk in resp.iter_content(chunk_size):
                 fd.write(chunk)
 
     @classmethod
-    def getXMLTree(cls, filename, verbose):
-        """
-        Opens a config file for reading.
+    def getXMLTree(cls, filename, verbose = False):
+        """ Opens a config file for reading.
         Returns XML Elementree object representing XML Config file.
-        
+
         Argument(s):
-        No arguments are required.
+            No arguments are required.
         
         Return value(s):
-        ElementTree
-        
-        Restrictions:
-        File must be named sites.xml and must be in same directory as caller.
-        This Method is tagged as a Class Method
+            ElementTree
         """
         if SitesFile.fileExists(filename):
             try:
@@ -173,17 +159,13 @@ class SitesFile(object):
 
     @classmethod
     def fileExists(cls, filename):
-        """
-        Checks if a file exists. Returns boolean representing if file exists.
+        """ Checks if a file exists.
+            Returns boolean representing if file exists.
         
         Argument(s):
-        No arguments are required.
+            No arguments are required.
         
         Return value(s):
-        Boolean
-        
-        Restrictions:
-        File must be named sites.xml and must be in same directory as caller.
-        This Method is tagged as a Class Method
+            Boolean
         """
         return os.path.exists(filename) and os.path.isfile(filename)

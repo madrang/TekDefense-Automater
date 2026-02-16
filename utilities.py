@@ -21,23 +21,16 @@ class Parser:
     """ Parser represents an argparse object representing the program's input parameters.
 
     Public Method(s):
-        hasBotOut
-        hasHTMLOutFile
+        print_help
+        (Property) hasBotOut
         (Property) HTMLOutFile
-        hasTextOutFile
         (Property) TextOutFile
-        hasCSVOutSet
         (Property) CSVOutFile
         (Property) Delay
-        hasProxy
         (Property) Proxy
-        print_help
-        hasTarget
         (Property) Target
-        hasInputFile
+        (Property) hasInputFile
         (Property) Source
-        hasSource
-        hasPost
         (Property) InputFile
         (Property) UserAgent
 
@@ -208,19 +201,6 @@ class Parser:
         return True if os.path.exists(self.args.target) and os.path.isfile(self.args.target) else False
 
     @property
-    def hasSource(self):
-        """ Checks to determine if -s parameter and source name was provided to the program.
-            Returns True if source name was provided, False if not.
-
-        Argument(s):
-            No arguments are required.
-
-        Return value(s):
-            Boolean
-        """
-        return True if self.args.source else False
-
-    @property
     def Source(self):
         """ Checks to determine if a source parameter was provided to the program.
             Returns string name of source or None if a source is not provided
@@ -229,7 +209,7 @@ class Parser:
             string -- String source name based on source parameter to program.
             None -- If the -s parameter is not used.
         """
-        return self.args.source if self.hasSource() else None
+        return self.args.source if self.args.source else None
 
     @property
     def InputFile(self):
@@ -240,7 +220,7 @@ class Parser:
             string -- String file name based on target filename parameter to program.
             None -- If the target is not a filename.
         """
-        return None if not self.hasTarget() or not self.hasInputFile() else self.Target
+        return None if not self.Target or not self.hasInputFile() else self.Target
 
     @property
     def UserAgent(self):
@@ -318,6 +298,28 @@ class IPWrapper:
             yield target
 
 class VersionChecker:
+
+    @classmethod
+    def checkModules(self, prefix, gitlocation, proxy = None, verbose = False):
+        execpath = os.path.dirname(os.path.realpath(__file__))
+        pythonfiles = [f for f in listdir(execpath) if isfile(join(execpath, f)) and f[-3:] == ".py"]
+        try:
+            modifiedfiles = VersionChecker.getModifiedFileInfo(prefix, gitlocation, pythonfiles, proxy = proxy)
+            if modifiedfiles is None or len(modifiedfiles) == 0:
+                SiteDetailOutput.PrintStandardOutput(
+                            "All Automater files are up to date"
+                                        , verbose = verbose)
+            else:
+                SiteDetailOutput.PrintStandardOutput(
+                    f"The following files require update: {", ".join(modifiedfiles)}."\
+                        f"\nSee {gitlocation} to update these files"
+                                    , verbose = verbose)
+        except:
+            SiteDetailOutput.PrintStandardOutput(
+                f"There was an error while checking the version of the Automater files."\
+                    f" Please see {gitlocation} to check if the files are still online."
+                                    , verbose = verbose)
+            raise
 
     @classmethod
     def getModifiedFileInfo(cls, prefix, gitlocation, filelist, proxy = None):

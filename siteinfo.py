@@ -278,28 +278,6 @@ class Site:
         self._verbose = verbose
 
     @classmethod
-    def checkmoduleversion(self, prefix, gitlocation, proxy = None, verbose = False):
-        execpath = os.path.dirname(os.path.realpath(__file__))
-        pythonfiles = [f for f in listdir(execpath) if isfile(join(execpath, f)) and f[-3:] == ".py"]
-        try:
-            modifiedfiles = VersionChecker.getModifiedFileInfo(prefix, gitlocation, pythonfiles, proxy = proxy)
-            if modifiedfiles is None or len(modifiedfiles) == 0:
-                SiteDetailOutput.PrintStandardOutput(
-                            "All Automater files are up to date"
-                                        , verbose = verbose)
-            else:
-                SiteDetailOutput.PrintStandardOutput(
-                    f"The following files require update: {", ".join(modifiedfiles)}."\
-                        f"\nSee {gitlocation} to update these files"
-                                    , verbose = verbose)
-        except:
-            SiteDetailOutput.PrintStandardOutput(
-                f"There was an error while checking the version of the Automater files."\
-                    f" Please see {gitlocation} to check if the files are still online."
-                                    , verbose = verbose)
-            raise
-
-    @classmethod
     def buildSiteFromXML(self, siteelement, webretrievedelay, proxy
                     , targettype, target, useragent
                     , botoutputrequested, verbose):
@@ -868,7 +846,7 @@ class Site:
         except:
             self.postErrorMessage(f"[-] Cannot connect to {self.FullURL}")
 
-    def parseContent(self, content, index=None):
+    def parseContent(self, content, index = None):
         """ Retrieves a list of information retrieved from the sites defined in the xml configuration file.
             Returns the list of found information from the sites being used as resources
                 or returns None if the site cannot be discovered.
@@ -894,7 +872,7 @@ class Site:
             SiteDetailOutput.PrintStandardOutput(
                 f"[-] {self.URL} requires a submission for {self.Target}. "
                     "Submitting now, this may take a moment."
-                            , verbose=self._verbose)
+                            , verbose = self._verbose)
             respContent = self.postContent()
         else:
             respContent = self.getContent()

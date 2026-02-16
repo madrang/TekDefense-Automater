@@ -39,7 +39,7 @@ Fork of https://github.com/1aN0rmus/TekDefense-Automater
 """
 import sys
 from siteinfo import SiteFacade, Site
-from utilities import Parser, IPWrapper
+from utilities import Parser, IPWrapper, VersionChecker
 from outputs import SiteDetailOutput
 from inputs import TargetFile
 
@@ -141,12 +141,12 @@ def main():
         sys.exit()
 
     if parser.VersionCheck:
-        Site.checkmoduleversion(__GITFILEPREFIX__, __GITLOCATION__, parser.Proxy, parser.Verbose)
+        VersionChecker.checkModules(__GITFILEPREFIX__, __GITLOCATION__, parser.Proxy, parser.Verbose)
 
     # user may only want to run against one source - allsources
     # is the seed used to check if the user did not enter an s tag
     sourcelist = ["allsources"]
-    if parser.hasSource:
+    if parser.Source:
         sourcelist = parser.Source.split(";")
 
     # a file input capability provides a possibility of

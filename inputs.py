@@ -54,12 +54,10 @@ class TargetFile(object):
             Iterator of string(s) found in a single or multi-line file.
         """
         try:
-            target = ""
-            with open(filename) as f:
-                li = f.readlines()
-                for i in li:
-                    target = str(i).strip()
-                    yield target
+            with open(filename) as file:
+                lines = file.readlines()
+                for li in lines:
+                    yield str(li).strip()
         except IOError:
             SiteDetailOutput.PrintStandardOutput("There was an error reading from the target input file."
                                         , verbose = verbose)
@@ -82,8 +80,6 @@ class SitesFile(object):
 
     @classmethod
     def updateTekDefenseXMLTree(cls, proxy = None, verbose = False):
-        if isinstance(proxy, str):
-            proxy = {"https": proxy, "http": proxy}
         remotemd5 = None
         localmd5 = None
         localfileexists = False
@@ -91,42 +87,45 @@ class SitesFile(object):
             localmd5 = VersionChecker.getMD5OfLocalFile(__TEKDEFENSEXML__)
             localfileexists = True
         except IOError:
-            SiteDetailOutput.PrintStandardOutput(f"Local file {__TEKDEFENSEXML__} not located. Attempting download."
-                            , verbose = verbose)
+            SiteDetailOutput.PrintStandardOutput(f"Local file {__TEKDEFENSEXML__} not located. "\
+                        "Attempting download.", verbose = verbose)
         try:
             if localfileexists:
                 remotemd5 = VersionChecker.getMD5OfRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy=proxy)
                 if remotemd5 and remotemd5 != localmd5:
-                    SiteDetailOutput.PrintStandardOutput(f"There is an updated remote {__TEKDEFENSEXML__} file at {__REMOTE_TEKD_XML_LOCATION__}. "
-                                                         "Attempting download."
-                                                         , verbose = verbose)
+                    SiteDetailOutput.PrintStandardOutput(
+                        f"There is an updated remote {__TEKDEFENSEXML__} file at {__REMOTE_TEKD_XML_LOCATION__}. "\
+                                    "Attempting download.", verbose = verbose)
                     SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
             else:
                 SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
         except ConnectionError as ce:
             try:
                 SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. Server response is {ce.message[0]} Server error "
+                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. "\
+                        f"Server response is {ce.message[0]} Server error "\
                         f"code is {ce.message[1][0]}", verbose = verbose)
             except:
                 SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive the {__TEKDEFENSEXML__} for use."
-                                        , verbose = verbose)
+                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive "\
+                        f"the {__TEKDEFENSEXML__} for use.", verbose = verbose)
         except HTTPError as he:
             try:
                 SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. Server response is {he.message}."
-                                            , verbose = verbose)
+                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. "\
+                        "Server response is {he.message}.", verbose = verbose)
             except:
                 SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive the {__TEKDEFENSEXML__} for use."
-                                        , verbose = verbose)
+                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive "\
+                        f"the {__TEKDEFENSEXML__} for use.", verbose = verbose)
 
     @classmethod
     def getRemoteFile(cls, location, proxy = None):
-        chunk_size = 65535
+        if isinstance(proxy, str):
+            proxy = {"https": proxy, "http": proxy}
         resp = requests.get(location, proxies = proxy, verify = False, timeout = 5)
         resp.raise_for_status()
+        chunk_size = 65535
         with open(__TEKDEFENSEXML__, "wb") as fd:
             for chunk in resp.iter_content(chunk_size):
                 fd.write(chunk)
@@ -134,7 +133,7 @@ class SitesFile(object):
     @classmethod
     def getXMLTree(cls, filename, verbose = False):
         """ Opens a config file for reading.
-        Returns XML Elementree object representing XML Config file.
+            Returns XML Elementree object representing XML Config file.
 
         Argument(s):
             No arguments are required.
@@ -142,20 +141,19 @@ class SitesFile(object):
         Return value(s):
             ElementTree
         """
-        if SitesFile.fileExists(filename):
-            try:
-                with open(filename) as f:
-                    sitetree = ElementTree()
-                    sitetree.parse(f)
-                    return sitetree
-            except:
-                SiteDetailOutput.PrintStandardOutput(
-                    f"There was an error reading from the {filename} input file.\n"
-                    f"Please check that the {filename} file is present and correctly formatted."
-                                        , verbose=verbose)
-        else:
-            SiteDetailOutput.PrintStandardOutput(f"No local {filename} file present.", verbose=verbose)
-        return None
+        if not SitesFile.fileExists(filename):
+            SiteDetailOutput.PrintStandardOutput(f"No local {filename} file present.", verbose = verbose)
+            return None
+        try:
+            with open(filename) as f:
+                sitetree = ElementTree()
+                sitetree.parse(f)
+                return sitetree
+        except:
+            SiteDetailOutput.PrintStandardOutput(
+                f"There was an error reading from the {filename} input file.\n"\
+                f"Please check that the {filename} file is present and correctly formatted."
+                                    , verbose = verbose)
 
     @classmethod
     def fileExists(cls, filename):

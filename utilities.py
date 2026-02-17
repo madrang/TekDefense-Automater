@@ -46,21 +46,38 @@ class Parser:
         Argument(s):
             desc -- ArgumentParser description.
         """
-        # Adding arguments
-        self._parser = argparse.ArgumentParser(description=desc)
-        self._parser.add_argument("target", help="List one IP Address (CIDR or dash notation accepted), URL or Hash to query or pass the filename of a file containing IP Address info, URL or Hash to query each separated by a newline.")
-        self._parser.add_argument("-o", "--output", help="This option will output the results to a file.")
-        self._parser.add_argument("-b", "--bot", action="store_true", help="This option will output minimized results for a bot.")
-        self._parser.add_argument("-f", "--cef", help="This option will output the results to a CEF formatted file.")
-        self._parser.add_argument("-w", "--web", help="This option will output the results to an HTML file.")
-        self._parser.add_argument("-c", "--csv", help="This option will output the results to a CSV file.")
-        self._parser.add_argument("-d", "--delay", type=int, default=2, help="This will change the delay to the inputted seconds. Default is 2.")
-        self._parser.add_argument("-s", "--source", help="This option will only run the target against a specific source engine to pull associated domains. Options are defined in the name attribute of the site element in the XML configuration file. This can be a list of names separated by a semicolon.")
-        self._parser.add_argument("--proxy", help="This option will set a proxy to use (eg. proxy.example.com:8080)")
-        self._parser.add_argument("-a", "--useragent", default=f"Automater/{version}", help="This option allows the user to set the user-agent seen by web servers being utilized. By default, the user-agent is set to Automater/version")
-        self._parser.add_argument("-V", "--vercheck", action="store_true", help="This option checks and reports versioning for Automater. Checks each python module in the Automater scope. Default, (no -V) is False")
-        self._parser.add_argument("-r", "--refreshxml", action="store_true", help="This option refreshes the tekdefense.xml file from the remote GitHub site. Default (no -r) is False.")
-        self._parser.add_argument("-v", "--verbose", action="store_true", help="This option prints messages to the screen. Default (no -v) is False.")
+        self._parser = argparse.ArgumentParser(description = desc)
+        self._parser.add_argument("target"
+            , help = "List one IP Address (CIDR or dash notation accepted), URL or Hash to query or pass the filename"\
+                " of a file containing IP Address info, URL or Hash to query each separated by a newline.")
+        self._parser.add_argument("-o", "--output"
+            , help = "This option will output the results to a file.")
+        self._parser.add_argument("-b", "--bot", action = "store_true"
+            , help = "This option will output minimized results for a bot.")
+        self._parser.add_argument("-f", "--cef"
+            , help = "This option will output the results to a CEF formatted file.")
+        self._parser.add_argument("-w", "--web"
+            , help = "This option will output the results to an HTML file.")
+        self._parser.add_argument("-c", "--csv"
+            , help = "This option will output the results to a CSV file.")
+        self._parser.add_argument("-d", "--delay", type = int, default = 2
+            , help = "This will change the delay to the inputted seconds. Default is 2.")
+        self._parser.add_argument("-s", "--source"
+            , help = "This option will only run the target against a specific source engine to pull associated domains."\
+                    " Options are defined in the name attribute of the site element in the XML configuration file."\
+                        " This can be a list of names separated by a semicolon.")
+        self._parser.add_argument("--proxy"
+            , help = "This option will set a proxy to use (eg. proxy.example.com:8080)")
+        self._parser.add_argument("-a", "--useragent", default = f"Automater/{version}"
+            , help="This option allows the user to set the user-agent seen by web servers being utilized."\
+                    " By default, the user-agent is set to Automater/version")
+        self._parser.add_argument("-V", "--vercheck", action = "store_true"
+            , help="This option checks and reports versioning for Automater."\
+                    " Checks each python module in the Automater scope.")
+        self._parser.add_argument("-r", "--refreshxml", action = "store_true"
+            , help = "This option refreshes the sites.xml file from the remote GitHub site.")
+        self._parser.add_argument("-v", "--verbose", action = "store_true"
+            , help = "This option prints debug messages to the screen.")
         self.args = self._parser.parse_args()
 
     def print_help(self):
@@ -150,8 +167,7 @@ class Parser:
 
     @property
     def RefreshRemoteXML(self):
-        """ Checks to determine if the user wants the program to grab the tekdefense.xml information each run.
-                By default this is True.
+        """ Checks to determine if the user wants the program to grab the sites.xml information each run.
 
         Return value(s):
             Boolean
@@ -231,6 +247,21 @@ class Parser:
         """
         return self.args.useragent
 
+class Utils:
+    """
+    """
+    @classmethod
+    def PrintStandardOutput(cls, strout, *args, **kwargs):
+        """
+        """
+        if "verbose" in list(kwargs.keys()):
+            if kwargs["verbose"] is True:
+                print(strout)
+            else:
+                return
+        else:
+            print(strout)
+
 class IPWrapper:
     """ IPWrapper provides Class Methods to enable checks against strings to determine if the string
             is an IP Address or an IP Address in CIDR or dash notation.
@@ -298,24 +329,31 @@ class IPWrapper:
             yield target
 
 class VersionChecker:
+    """ Uses MD5 to indicate if any files needs to be updated.
+    Public Method(s):
+        (Class Method) isIPorIPList
+        (Class Method) getTarget
 
+    Instance variable(s):
+        No instance variables.
+    """
     @classmethod
     def checkModules(self, prefix, gitlocation, proxy = None, verbose = False):
         execpath = os.path.dirname(os.path.realpath(__file__))
-        pythonfiles = [f for f in listdir(execpath) if isfile(join(execpath, f)) and f[-3:] == ".py"]
+        pythonfiles = [f for f in os.listdir(execpath) if os.path.isfile(os.path.join(execpath, f)) and f[-3:] == ".py"]
         try:
             modifiedfiles = VersionChecker.getModifiedFileInfo(prefix, gitlocation, pythonfiles, proxy = proxy)
             if modifiedfiles is None or len(modifiedfiles) == 0:
-                SiteDetailOutput.PrintStandardOutput(
+                Utils.PrintStandardOutput(
                             "All Automater files are up to date"
                                         , verbose = verbose)
             else:
-                SiteDetailOutput.PrintStandardOutput(
+                Utils.PrintStandardOutput(
                     f"The following files require update: {", ".join(modifiedfiles)}."\
                         f"\nSee {gitlocation} to update these files"
                                     , verbose = verbose)
         except:
-            SiteDetailOutput.PrintStandardOutput(
+            Utils.PrintStandardOutput(
                 f"There was an error while checking the version of the Automater files."\
                     f" Please see {gitlocation} to check if the files are still online."
                                     , verbose = verbose)
@@ -342,4 +380,4 @@ class VersionChecker:
             proxy = { "https": proxy, "http": proxy }
         resp = requests.get(location, proxies = proxy, verify = False, timeout = 5)
         resp.raise_for_status()
-        return hashlib.md5(str(resp.content)).hexdigest()
+        return hashlib.md5(resp.content).hexdigest()

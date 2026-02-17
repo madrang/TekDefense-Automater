@@ -24,11 +24,11 @@ from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
 from xml.etree.ElementTree import ElementTree
 
-from outputs import SiteDetailOutput
-from utilities import VersionChecker
+#from outputs import SiteDetailOutput
+from utilities import Utils, VersionChecker
 
-__REMOTE_TEKD_XML_LOCATION__ = "https://raw.githubusercontent.com/madrang/TekDefense-Automater/master/tekdefense.xml"
-__TEKDEFENSEXML__ = "tekdefense.xml"
+__SITESXML__ = "sites.xml"
+__REMOTE_SITESXML_LOCATION__ = "https://raw.githubusercontent.com/madrang/MadDefense-Automater/master/sites.xml"
 
 class TargetFile(object):
     """ TargetFile provides a Class Method to retrieve information from a file-based target when one is entered
@@ -59,15 +59,15 @@ class TargetFile(object):
                 for li in lines:
                     yield str(li).strip()
         except IOError:
-            SiteDetailOutput.PrintStandardOutput("There was an error reading from the target input file."
+            Utils.PrintStandardOutput("There was an error reading from the target input file."
                                         , verbose = verbose)
 
 class SitesFile(object):
     """ SitesFile represents an XML Elementree object representing the program's configuration file.
-    The tekdefense.xml file is hosted on tekdefense.com's github and unless asked otherwise,
+    The sites.xml file is hosted on sites.com's github and unless asked otherwise,
             will be checked to ensure the versions are correct.
-    If they are not, the new tekdefense.xml will be downloaded and used by default.
-    The local sites.xml is the user's capability to have local decisions made on top of the tekdefense.xml configuration file.
+    If they are not, the new sites.xml will be downloaded and used by default.
+    The local sites.xml is the user's capability to have local decisions made on top of the sites.xml configuration file.
     Switches will be created to enable and disable these capabilities.
 
     Method(s):
@@ -79,45 +79,45 @@ class SitesFile(object):
     """
 
     @classmethod
-    def updateTekDefenseXMLTree(cls, proxy = None, verbose = False):
-        remotemd5 = None
+    def updateSitesDefenseXMLTree(cls, proxy = None, verbose = False):
         localmd5 = None
-        localfileexists = False
         try:
-            localmd5 = VersionChecker.getMD5OfLocalFile(__TEKDEFENSEXML__)
-            localfileexists = True
+            localmd5 = VersionChecker.getMD5OfLocalFile(__SITESXML__)
         except IOError:
-            SiteDetailOutput.PrintStandardOutput(f"Local file {__TEKDEFENSEXML__} not located. "\
-                        "Attempting download.", verbose = verbose)
+            Utils.PrintStandardOutput(f"Local file {__SITESXML__} not located."\
+                        " Attempting download.", verbose = verbose)
+        remotemd5 = None
         try:
-            if localfileexists:
-                remotemd5 = VersionChecker.getMD5OfRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy=proxy)
-                if remotemd5 and remotemd5 != localmd5:
-                    SiteDetailOutput.PrintStandardOutput(
-                        f"There is an updated remote {__TEKDEFENSEXML__} file at {__REMOTE_TEKD_XML_LOCATION__}. "\
-                                    "Attempting download.", verbose = verbose)
-                    SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
-            else:
-                SitesFile.getRemoteFile(__REMOTE_TEKD_XML_LOCATION__, proxy)
+            remotemd5 = SitesFile.getRemoteFile(__REMOTE_SITESXML_LOCATION__, proxy = proxy)
         except ConnectionError as ce:
             try:
-                SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. "\
-                        f"Server response is {ce.message[0]} Server error "\
-                        f"code is {ce.message[1][0]}", verbose = verbose)
+                Utils.PrintStandardOutput(
+                    f"Cannot connect to {__REMOTE_SITESXML_LOCATION__}."\
+                        f" Server response is {ce.message[0]} Server error"\
+                        f" code is {ce.message[1][0]}", verbose = verbose)
             except:
-                SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive "\
-                        f"the {__TEKDEFENSEXML__} for use.", verbose = verbose)
+                Utils.PrintStandardOutput(
+                    f"Cannot connect to {__REMOTE_SITESXML_LOCATION__} to retreive"\
+                        f" the {__SITESXML__} for use.", verbose = verbose)
         except HTTPError as he:
             try:
-                SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__}. "\
-                        "Server response is {he.message}.", verbose = verbose)
+                Utils.PrintStandardOutput(
+                    f"Cannot connect to {__REMOTE_SITESXML_LOCATION__}."\
+                        " Server response is {he.message}.", verbose = verbose)
             except:
-                SiteDetailOutput.PrintStandardOutput(
-                    f"Cannot connect to {__REMOTE_TEKD_XML_LOCATION__} to retreive "\
-                        f"the {__TEKDEFENSEXML__} for use.", verbose = verbose)
+                Utils.PrintStandardOutput(
+                    f"Cannot connect to {__REMOTE_SITESXML_LOCATION__} to retreive"\
+                        f" the {__SITESXML__} for use.", verbose = verbose)
+        if localmd5:
+            if not remotemd5:
+                remotemd5 = VersionChecker.getMD5OfRemoteFile(__REMOTE_SITESXML_LOCATION__, proxy = proxy)
+            if remotemd5 != localmd5:
+                Utils.PrintStandardOutput(
+                    f"There is an updated remote {__SITESXML__} file at {__REMOTE_SITESXML_LOCATION__}."\
+                                " Attempting download.", verbose = verbose)
+        else:
+            Utils.PrintStandardOutput(
+                f"Downloaded remote {__SITESXML__} file from {__REMOTE_SITESXML_LOCATION__}.", verbose = verbose)
 
     @classmethod
     def getRemoteFile(cls, location, proxy = None):
@@ -126,9 +126,13 @@ class SitesFile(object):
         resp = requests.get(location, proxies = proxy, verify = False, timeout = 5)
         resp.raise_for_status()
         chunk_size = 65535
-        with open(__TEKDEFENSEXML__, "wb") as fd:
+        md5Hash = hashlib.md5()
+        with open(__SITESXML__, "wb") as fd:
             for chunk in resp.iter_content(chunk_size):
                 fd.write(chunk)
+                md5Hash.update(chunk)
+        return md5Hash.hexdigest()
+
 
     @classmethod
     def getXMLTree(cls, filename, verbose = False):
@@ -142,7 +146,7 @@ class SitesFile(object):
             ElementTree
         """
         if not SitesFile.fileExists(filename):
-            SiteDetailOutput.PrintStandardOutput(f"No local {filename} file present.", verbose = verbose)
+            Utils.PrintStandardOutput(f"No local {filename} file present.", verbose = verbose)
             return None
         try:
             with open(filename) as f:
@@ -150,7 +154,7 @@ class SitesFile(object):
                 sitetree.parse(f)
                 return sitetree
         except:
-            SiteDetailOutput.PrintStandardOutput(
+            Utils.PrintStandardOutput(
                 f"There was an error reading from the {filename} input file.\n"\
                 f"Please check that the {filename} file is present and correctly formatted."
                                     , verbose = verbose)

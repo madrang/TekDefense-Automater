@@ -71,7 +71,6 @@ class SiteDetailOutput:
         if parser.CSVOutFile:
             self.PrintToCSVFile(parser.CSVOutFile)
 
-
     def PrintToScreen(self, printinbotformat):
         """ Calls correct function to ensure site information is printed to the user's standard output correctly.
 
@@ -510,42 +509,32 @@ class SiteDetailOutput:
                     for index in range(len(site.RegEx)): # the regexs will ensure we have the exact number of lookups
                         site_importantProperty = site.getImportantProperty(index)
                         if site_importantProperty is None or len(site_importantProperty) == 0:
-                            f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName[index]}</td><td>No results found</td></tr>")
+                            f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName[index]}</td><td>No results found</td></tr>\n")
                         else:
                             if site_importantProperty[index] is None or len(site_importantProperty[index]) == 0:
-                                f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName[index]}</td><td>No results found</td></tr>")
+                                f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName[index]}</td><td>No results found</td></tr>\n")
                             else:
                                 # if it's just a string we don't want it to output like a list
                                 if isinstance(site_importantProperty, str):
-                                    f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>{site_importantProperty}</td></tr>")
+                                    f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>{site_importantProperty}</td></tr>\n")
                                 else:
                                     for siteresult in site_importantProperty[index]:
-                                        f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName[index]}</td><td>{siteresult}</td></tr>")
+                                        f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName[index]}</td><td>{siteresult}</td></tr>\n")
                 else:  # this is a singlesite
                     site_importantProperty = site.getImportantProperty()
                     if site_importantProperty is None or len(site_importantProperty) == 0:
-                        f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>No results found</td></tr>")
+                        f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>No results found</td></tr>\n")
                     else:
                         # if it's just a string we don't want it output like a list
                         if isinstance(site_importantProperty, str):
-                            f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>{site_importantProperty}</td></tr>")
+                            f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>{site_importantProperty}</td></tr>\n")
                         else:
                             for siteresult in site_importantProperty:
-                                f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>{siteresult}</td></tr>")
+                                f.write(f"<tr><td>{site.Target}</td><td>{site.TargetType}</td><td>{site.FriendlyName}</td><td>{siteresult}</td></tr>\n")
         f.write(self.getHTMLClosing())
         f.flush()
         f.close()
         print(f"{htmloutfile} Generated")
-
-    @classmethod
-    def PrintStandardOutput(cls, strout, *args, **kwargs):
-        if "verbose" in list(kwargs.keys()):
-            if kwargs["verbose"] is True:
-                print(strout)
-            else:
-                return
-        else:
-            print(strout)
 
     def getHTMLOpening(self):
         """ Creates HTML markup to provide correct formatting for initial HTML file requirements.
@@ -557,75 +546,75 @@ class SiteDetailOutput:
             string -- contains opening HTML markup information for HTML output file.
         """
         return """<style type="text/css">
-                        #table-3 {
-                            border: 1px solid #DFDFDF;
-                            background-color: #F9F9F9;
-                            width: 100%;
-                            -moz-border-radius: 3px;
-                            -webkit-border-radius: 3px;
-                            border-radius: 3px;
-                            font-family: Arial,"Bitstream Vera Sans",Helvetica,Verdana,sans-serif;
-                            color: #333;
-                        }
-                        #table-3 td, #table-3 th {
-                            border-top-color: white;
-                            border-bottom: 1px solid #DFDFDF;
-                            color: #555;
-                        }
-                        #table-3 th {
-                            text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
-                            font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
-                            font-weight: normal;
-                            padding: 7px 7px 8px;
-                            text-align: left;
-                            line-height: 1.3em;
-                            font-size: 14px;
-                        }
-                        #table-3 td {
-                            font-size: 12px;
-                            padding: 4px 7px 2px;
-                            vertical-align: top;
-                        }res
-                        h1 {
-                            text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
-                            font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
-                            font-weight: normal;
-                            padding: 7px 7px 8px;
-                            text-align: Center;
-                            line-height: 1.3em;
-                            font-size: 40px;
-                        }
-                        h2 {
-                            text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
-                            font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
-                            font-weight: normal;
-                            padding: 7px 7px 8px;
-                            text-align: left;
-                            line-height: 1.3em;
-                            font-size: 16px;
-                        }
-                        h4 {
-                            text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
-                            font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
-                            font-weight: normal;
-                            padding: 7px 7px 8px;
-                            text-align: left;
-                            line-height: 1.3em;
-                            font-size: 10px;
-                        }
-                        </style>
-                        <html>
-                        <body>
-                        <title> Automater Results </title>
-                        <h1> Automater Results </h1>
-                        <table id="table-3">
-                        <tr>
-                        <th>Target</th>
-                        <th>Type</th>
-                        <th>Source</th>
-                        <th>Result</th>
-                        </tr>
-            """
+    #table-3 {
+        border: 1px solid #DFDFDF;
+        background-color: #F9F9F9;
+        width: 100%;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        font-family: Arial,"Bitstream Vera Sans",Helvetica,Verdana,sans-serif;
+        color: #333;
+    }
+    #table-3 td, #table-3 th {
+        border-top-color: white;
+        border-bottom: 1px solid #DFDFDF;
+        color: #555;
+    }
+    #table-3 th {
+        text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
+        font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+        font-weight: normal;
+        padding: 7px 7px 8px;
+        text-align: left;
+        line-height: 1.3em;
+        font-size: 14px;
+    }
+    #table-3 td {
+        font-size: 12px;
+        padding: 4px 7px 2px;
+        vertical-align: top;
+    }res
+    h1 {
+        text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
+        font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+        font-weight: normal;
+        padding: 7px 7px 8px;
+        text-align: Center;
+        line-height: 1.3em;
+        font-size: 40px;
+    }
+    h2 {
+        text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
+        font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+        font-weight: normal;
+        padding: 7px 7px 8px;
+        text-align: left;
+        line-height: 1.3em;
+        font-size: 16px;
+    }
+    h4 {
+        text-shadow: rgba(255, 255, 255, 0.796875) 0px 1px 0px;
+        font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
+        font-weight: normal;
+        padding: 7px 7px 8px;
+        text-align: left;
+        line-height: 1.3em;
+        font-size: 10px;
+    }
+</style>
+<html>
+    <body>
+        <title> Automater Results </title>
+        <h1> Automater Results </h1>
+        <table id="table-3">
+            <tr>
+            <th>Target</th>
+            <th>Type</th>
+            <th>Source</th>
+            <th>Result</th>
+            </tr>
+"""
 
     def getHTMLClosing(self):
         """ Creates HTML markup to provide correct formatting for closing HTML file requirements.
@@ -636,10 +625,8 @@ class SiteDetailOutput:
         Return value(s):
             string -- contains closing HTML markup information for HTML output file.
         """
-        return """
-            </table>
-            <br><br>
-            <p>Created using Automater.py by @TekDefense <a href="http://www.tekdefense.com">http://www.tekdefense.com</a>; <a href="https://github.com/madrang/TekDefense">https://github.com/madrang/TekDefense</a></p>
-            </body>
-            </html>
-            """
+        return """        </table>
+        <br><br>
+        <p>Created using Automater.py <a href="https://github.com/madrang/MadDefense-Automater">https://github.com/madrang/MadDefense-Automater</a></p>
+    </body>
+</html>"""

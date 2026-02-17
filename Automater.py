@@ -21,7 +21,7 @@ Optional Parameters are:
     -V, --vercheck -- This option checks and reports versioning for Automater.
                         Checks each python module in the Automater scope.
                             Default, (no -V) is False
-    -r, --refreshxml -- This option refreshes the tekdefense.xml file from the remote GitHub site.
+    -r, --refreshxml -- This option refreshes the sites.xml file from the remote GitHub site.
                             Default (no -r) is False.
     -v, --verbose -- This option prints messages to the screen. Default (no -v) is False.
 
@@ -44,8 +44,8 @@ from outputs import SiteDetailOutput
 from inputs import TargetFile
 
 __VERSION__ = "0.1.1"
-__GITLOCATION__ = "https://github.com/madrang/TekDefense-Automater"
-__GITFILEPREFIX__ = "https://raw.githubusercontent.com/madrang/TekDefense-Automater/master/"
+__GITLOCATION__ = "https://github.com/madrang/MadDefense-Automater"
+__GITFILEPREFIX__ = "https://raw.githubusercontent.com/madrang/MadDefense-Automater/master/"
 
 class Automater():
     def __init__(self, Proxy=None):

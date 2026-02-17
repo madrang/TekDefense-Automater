@@ -14,17 +14,15 @@ Exception(s):
 import requests
 import re
 import time
-import os
-from os import listdir
-from os.path import isfile, join
+#import os
 from requests.exceptions import ConnectionError
 from outputs import SiteDetailOutput
 from inputs import SitesFile
-from utilities import VersionChecker
+from utilities import Utils, VersionChecker
 
 requests.packages.urllib3.disable_warnings()
 
-__TEKDEFENSEXML__ = "tekdefense.xml"
+__SETTINGSXML__ = "settings.xml"
 __SITESXML__ = "sites.xml"
 
 class SiteFacade:
@@ -53,10 +51,6 @@ class SiteFacade:
 
     def runSiteElement(self, webretrievedelay, proxy, siteelement, targetlist, sourcelist
                     , useragent, botoutputrequested):
-        if not self.siteEntryIsValid(siteelement):
-            print(f"A problem was found in the {__SITESXML__} file. There appears to be a site entry with "\
-                    "unequal numbers of regexs and reporting requirements")
-            return
         for targ in targetlist:
             for source in sourcelist:
                 sitetypematch, targettype, target = self.getSiteInfoIfSiteTypesMatch(source, targ, siteelement)
@@ -87,21 +81,29 @@ class SiteFacade:
             Nothing is returned from this Method.
         """
         if refreshremotexml:
-            SitesFile.updateTekDefenseXMLTree(proxy, self._verbose)
+            SitesFile.updateSitesDefenseXMLTree(proxy, self._verbose)
 
-        remotesitetree = SitesFile.getXMLTree(__TEKDEFENSEXML__, self._verbose)
-        localsitetree = SitesFile.getXMLTree(__SITESXML__, self._verbose)
+        remotesitetree = SitesFile.getXMLTree(__SITESXML__, self._verbose)
+        localsitetree = SitesFile.getXMLTree(__SETTINGSXML__, self._verbose)
 
         if not localsitetree and not remotesitetree:
-            print(f"Unfortunately there is neither a {__TEKDEFENSEXML__} file nor a {__SITESXML__} file that can be utilized for proper parsing.\n"\
+            print(f"Unfortunately there is neither a {__SITESXML__} file nor a {__SETTINGSXML__} file that can be utilized for proper parsing.\n"\
                   "At least one configuration XML file must be available for Automater to work properly.\n"\
                   f"Please see {versionlocation} for further instructions.")
             return
         if localsitetree:
             for siteelement in localsitetree.iter(tag="site"):
+                if not self.siteEntryIsValid(siteelement):
+                    print(f"A problem was found in the {__SETTINGSXML__} file. There appears to be a site entry with "\
+                            "unequal numbers of regexs and reporting requirements")
+                    sys.exit(1)
                 self.runSiteElement(webretrievedelay, proxy, siteelement, targetlist, sourcelist, useragent, botoutputrequested)
         if remotesitetree:
             for siteelement in remotesitetree.iter(tag="site"):
+                if not self.siteEntryIsValid(siteelement):
+                    print(f"A problem was found in the {__SITESXML__} file. There appears to be a site entry with "\
+                            "unequal numbers of regexs and reporting requirements")
+                    sys.exit(1)
                 self.runSiteElement(webretrievedelay, proxy, siteelement, targetlist, sourcelist, useragent, botoutputrequested)
 
     def getSiteInfoIfSiteTypesMatch(self, source, target, siteelement):
@@ -329,18 +331,12 @@ class Site:
             List representing all entry keys found within the elementstring.
             string representing an entry key if only one is found within the elementstring.
         """
-        variablename = ""
-        if len(siteelement.find(elementstring).findall("entry")) == 0:
+        elements = siteelement.find(elementstring).findall("entry")
+        if len(elements) <= 0:
             return None
-
-        if len(siteelement.find(elementstring).findall("entry")) > 1:
-            variablename = []
-            for entry in siteelement.find(elementstring).findall("entry"):
-                variablename.append(entry.text)
-        else:
-            variablename = ""
-            variablename = siteelement.find(elementstring).find("entry").text
-        return variablename
+        if len(elements) == 1:
+            return elements[0].text
+        return [entry.text for entry in elements]
 
     @classmethod
     def buildDictionaryFromXML(self, siteelement, elementstring):
@@ -696,7 +692,7 @@ class Site:
         """
         if self.BotOutputRequested:
             return
-        SiteDetailOutput.PrintStandardOutput(message, verbose=self._verbose)
+        Utils.PrintStandardOutput(message, verbose=self._verbose)
 
     def postErrorMessage(self, message):
         """ Prints multiple error messages to inform the user of progress.
@@ -869,7 +865,7 @@ class Site:
         self.postMessage(f"{self.UserMessage} {self.FullURL}")
 
         if self.Method == "POST":
-            SiteDetailOutput.PrintStandardOutput(
+            Utils.PrintStandardOutput(
                 f"[-] {self.URL} requires a submission for {self.Target}. "
                     "Submitting now, this may take a moment."
                             , verbose = self._verbose)
